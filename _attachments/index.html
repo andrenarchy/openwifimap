@@ -4,22 +4,37 @@
         <title>OpenWiFiMap</title>
         <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
         <link rel="stylesheet" href="style.css">
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
         <script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-        <script src="external/OpenLayers.js"></script>
         <script>
             var setheight = function() {
                 var header = $("#header:visible");
                 var footer = $("#footer:visible");
                 var content = $("#content:visible");
+                var map = $("#map:visible");
                 var windowheight = $(window).height();
                 var newheight = windowheight - header.outerHeight() - footer.outerHeight();
-                newheight -= (content.outerHeight() - content.height());
+                //newheight -= (content.outerHeight() - content.height());
                 scroll(0, 0);
                 content.height(newheight);
+                map.height(newheight);
             }; 
             $(document).ready(function() {
                 $(window).bind("orientationchange resize pageshow", setheight);
+                setheight();
+
+                // add map
+                var map = new OpenLayers.Map('map');
+                map.addLayer(new OpenLayers.Layer.OSM());
+                map.zoomToMaxExtent();
+
+                // get location
+                navigator.geolocation.getCurrentPosition( function(pos) {
+                    var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
+                      .transform( new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject() );
+                    map.setCenter(lonlat, 13);
+                });
             });
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
