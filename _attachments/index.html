@@ -25,16 +25,18 @@
                 setheight();
 
                 // add map
-                var map = new OpenLayers.Map('map');
+                var map = new OpenLayers.Map({div: 'map',  maxResolution: "auto",  minResolution: "auto" });
                 map.addLayer(new OpenLayers.Layer.OSM());
                 map.zoomToMaxExtent();
 
                 // get location
-                navigator.geolocation.getCurrentPosition( function(pos) {
-                    var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
-                      .transform( new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject() );
-                    map.setCenter(lonlat, 13);
-                });
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition( function(pos) {
+                        var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
+                          .transform( new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject() );
+                        map.setCenter(lonlat, 13);
+                    });
+                }
             });
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
