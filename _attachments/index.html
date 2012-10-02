@@ -2,41 +2,77 @@
 <html>
     <head>
         <title>OpenWiFiMap</title>
-        <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
-        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+        <link rel="stylesheet" href="http://www.openlayers.org/api/theme/default/style.css" />
+        <link rel="stylesheet" href="style.css" />
         <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
         <script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         <script>
-            var setheight = function() {
-                var header = $("#header:visible");
-                var footer = $("#footer:visible");
-                var content = $("#content:visible");
-                var map = $("#map:visible");
-                var windowheight = $(window).height();
-                var newheight = windowheight - header.outerHeight() - footer.outerHeight();
-                //newheight -= (content.outerHeight() - content.height());
-                scroll(0, 0);
-                content.height(newheight);
-                map.height(newheight);
-            }; 
-            $(document).ready(function() {
-                $(window).bind("orientationchange resize pageshow", setheight);
-                setheight();
-
-                // add map
-                var map = new OpenLayers.Map({div: 'map',  maxResolution: "auto",  minResolution: "auto" });
-                map.addLayer(new OpenLayers.Layer.OSM());
-                map.zoomToMaxExtent();
-
-                // get location
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition( function(pos) {
-                        var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
-                          .transform( new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject() );
-                        map.setCenter(lonlat, 13);
-                    });
+            var map, position;
+            function initMap() {
+                // create map
+                map = new OpenLayers.Map({
+                    div: 'map',
+                    layers: [
+                        new OpenLayers.Layer.OSM("OpenStreetMap"),
+                    ]
                 }
+                );
+                map.zoomToMaxExtent();
+            }
+
+            // fix height of content
+            function fixContentHeight() {
+                var footer = $("div[data-role='footer']:visible"),
+                header = $("div[data-role='header']:visible"),
+                content = $("div[data-role='content']:visible:visible"),
+                viewHeight = $(window).height(),
+                contentHeight = viewHeight - header.outerHeight() - footer.outerHeight();
+
+                if ((content.outerHeight() + header.outerHeight() + footer.outerHeight()) !== viewHeight) {
+                    contentHeight -= (content.outerHeight() - content.height() /*+1*/ );
+                    content.height(contentHeight);
+                }
+            }
+
+            function fixMap() {
+                fixContentHeight();
+                if (window.map && window.map instanceof OpenLayers.Map) {
+                    map.updateSize();
+                } else {
+                    initMap();
+                    getPosition();
+                }
+            }
+
+            function showPosition(pos) {
+                position = pos;
+                var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
+                  .transform( new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject() );
+                map.setCenter(lonlat, 13);
+            }
+
+            function showPositionHigh(pos) {
+                showPosition(pos);
+            }
+
+            function showPositionLow(pos) {
+                showPosition(pos);
+                navigator.geolocation.getCurrentPosition(showPositionHigh, null, {timeout: 10000, maximumAge:1000, enableHighAccuracy: true});
+            }
+
+            function getPosition() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPositionLow, null, {timeout: 5000, enableHighAccuracy: false});
+                }
+            }
+
+            //fix the content height AFTER jQuery Mobile has rendered the map page
+            $('#mappage').live('pageshow', fixMap);
+            $(window).bind("orientationchange resize pageshow", fixContentHeight);
+            $(document).ready( function() {
+                $.mobile.defaultHomeScroll=0;
             });
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
@@ -51,20 +87,27 @@
                 <div id="map"></div>
             </div>
             <div data-role="footer" id="footer">
-                Nothing down here... <a href="#listpage">list</a>
+                <div class="ui-grid-b">
+                    <div class="ui-block-a"></div>
+                    <div class="ui-block-b"></div>
+                    <div class="ui-block-c"><a href="#listpage" data-transition="slide"><button type="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">Show list</button></a></div>
+                </div>
             </div>
         </div>
         
         <div data-role="page" id="listpage" data-theme="b">
              <div data-role="header">
-                <h1>OpenWiFiMap&nbsp;-&nbsp;List</h1>
+                <h1>OpenWiFiMap&nbsp;&ndash;&nbsp;List</h1>
             </div>
             <div data-role="content">       
                 <p>I need some serious list content here!.</p>
-                Wanna go to the <a href="#mappage">map page</a>
             </div>
             <div data-role="footer">
-                Also nothing down here...
+                <div class="ui-grid-b">
+                    <div class="ui-block-a"><a href="#mappage" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show map</button></a></div>
+                    <div class="ui-block-b"></div>
+                    <div class="ui-block-c"></div>
+                </div>
             </div>
         </div>
     </body>
