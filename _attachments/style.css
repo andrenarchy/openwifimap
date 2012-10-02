@@ -1,13 +1,9 @@
-html, body, .ui-content, #content, #mappage, #map {
+html, body, #content, #mappage, #map {
     width: 100%; 
     height: 100%;
     padding: 0;
     margin: 0;
 }
-
-/*#map {
-    height: 200px;
-}*/
 
 .olControlAttribution {
     bottom: 5px;
