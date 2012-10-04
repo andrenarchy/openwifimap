@@ -10,16 +10,18 @@
         <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         <script>
             var map, position;
+
+            function handleMove() {
+                bbox = map.getExtent().transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326")).toBBOX();
+                console.log(bbox);
+            }
+
             function initMap() {
                 // create map
-                map = new OpenLayers.Map({
-                    div: 'map',
-                    layers: [
-                        new OpenLayers.Layer.OSM("OpenStreetMap"),
-                    ]
-                }
-                );
+                map = new OpenLayers.Map('map');
+                map.addLayer(new OpenLayers.Layer.OSM());
                 map.zoomToMaxExtent();
+                map.events.register('moveend', map, handleMove);
             }
 
             // fix height of content
