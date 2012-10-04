@@ -9,17 +9,54 @@
         <script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
         <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         <script>
-            var map, position;
+            var map;
+            var markers;
+            var position;
+            var nodes = { };
+            var icon;
+            var epsg4326 = new OpenLayers.Projection("EPSG:4326");
 
             function handleMove() {
-                bbox = map.getExtent().transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326")).toBBOX();
-                console.log(bbox);
+                $.ajax({
+                    url: '_spatial/nodes',
+                    dataType: 'json',
+                    data: {
+                        "bbox": map.getExtent().transform(map.getProjectionObject(), epsg4326).toBBOX()
+                    },
+                    success: function(data){
+                        if (data.rows && $.isArray(data.rows)) {
+                            // store nodes in object 'nodes'
+                            data.rows.forEach( function(row) {
+                                if (row.id && row.geometry && row.geometry.coordinates && row.value) {
+                                    lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, map.getProjectionObject());
+                                    if (nodes.hasOwnProperty(row.id)) {
+                                        markers.removeMarker(nodes[row.id].marker);
+                                    } 
+                                    nodes[row.id] = {
+                                        value: row.value,
+                                        marker: new OpenLayers.Marker(lonlat, icon.clone())
+                                    };
+                                    markers.addMarker( nodes[row.id].marker );
+                                }
+                            });
+                            // TODO: find neighbours that are not yet in 'nodes'
+                        }
+                    },
+                    error: function(jqXHR, textstatus, errorThrown) {
+                        console.log(textstatus);
+                    }
+                });
             }
 
             function initMap() {
                 // create map
                 map = new OpenLayers.Map('map');
                 map.addLayer(new OpenLayers.Layer.OSM());
+                markers = new OpenLayers.Layer.Markers( "Markers" );
+                map.addLayer(markers);
+                var size = new OpenLayers.Size(21,25);
+                var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+                icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
                 map.zoomToMaxExtent();
                 map.events.register('moveend', map, handleMove);
             }
