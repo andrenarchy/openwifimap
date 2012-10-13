@@ -8,7 +8,7 @@
         <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
         <script>
             $(document).bind("mobileinit", function(){
-                //$.mobile.hashListeningEnabled = false;
+                $.mobile.hashListeningEnabled = false;
                 $.mobile.pushStateEnabled = false;
             });
         </script>
@@ -71,6 +71,7 @@
                     hs = parseHashSearchUrl( data.toPage );
                 } else {
                     console.log("nothing");
+                    console.log(data);
                     return;
                 }
 
@@ -86,6 +87,12 @@
                 console.log("hash: " + hs.hash);
                 console.log("search: " + hs.search);
                 console.log(data);
+            });
+            
+            $( window ).bind( "hashchange", function( e ) {
+                console.log("hashchange");
+                console.log($.mobile.path.parseLocation().hash);
+                $.mobile.changePage( $.mobile.path.parseLocation().hash );
             });
 
             var map;
