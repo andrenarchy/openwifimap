@@ -13,6 +13,7 @@
             });
         </script>
         <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+        <script src="http://raw.github.com/dreamerslab/jquery.actual/master/jquery.actual.js"></script>
         <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         <script>
             // this function is free software, Copyright (c) 2011, Kin Blas
@@ -148,15 +149,15 @@
             }
 
             // fix height of content
-            function fixContentHeight() {
-                var footer = $("div[data-role='footer']:visible"),
-                header = $("div[data-role='header']:visible"),
-                content = $("div[data-role='content']:visible:visible"),
+            function fixContentHeight(newPageID) {
+                var currentPageID = $.mobile.activePage.attr('id'),
+                footer = $("#" + currentPageID + " > div[data-role='footer']"),
+                header = $("#" + currentPageID + " > div[data-role='header']"),
+                content = $("#" + currentPageID + " > div[data-role='content']"),
                 viewHeight = $(window).height(),
-                contentHeight = viewHeight - header.outerHeight() - footer.outerHeight();
-
-                if ((content.outerHeight() + header.outerHeight() + footer.outerHeight()) !== viewHeight) {
-                    contentHeight -= (content.outerHeight() - content.height() /*+1*/ );
+                contentHeight = viewHeight - header.actual('outerHeight') - footer.actual('outerHeight');
+                if (content.actual('outerHeight') + header.actual('outerHeight') + footer.actual('outerHeight') !== viewHeight) {
+                    contentHeight -= (content.actual('outerHeight') - content.actual('height') /*+1*/ );
                     content.height(contentHeight);
                 }
             }
@@ -195,7 +196,7 @@
 
             //fix the content height AFTER jQuery Mobile has rendered the map page
             $('#mappage').live('pageshow', fixMap);
-            $(window).bind("orientationchange resize pageshow", fixContentHeight);
+            $(window).bind("orientationchange resize pagebeforeshow pageshow", fixContentHeight);
             $(document).ready( function() {
                 $.mobile.defaultHomeScroll=0;
             });
