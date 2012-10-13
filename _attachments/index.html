@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>OpenWiFiMap</title>
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.css" />
         <link rel="stylesheet" href="http://www.openlayers.org/api/theme/default/style.css" />
         <link rel="stylesheet" href="style.css" />
@@ -60,22 +59,19 @@
             }
 
             var firstPage = true;
+            var ignoreNextHashChange = false;
             var defaultPage = "mappage";
             $( document ).bind( "pagebeforechange", function( e, data ) {
                 var hs;
                 if (firstPage) {
-                    console.log("firstpage");
                     hs = parseHashSearchUrl(window.location.href);
-                    firstPage=false;
                 } else if (typeof data.toPage === "string") {
-                    console.log("toPage==string");
                     hs = parseHashSearchUrl( data.toPage );
                 } else {
-                    console.log("nothing");
-                    console.log(data);
                     return;
                 }
 
+                firstPage=false;
                 if (!data.options.dataUrl) {
                     data.options.dataUrl = data.toPage;
                 }
@@ -85,16 +81,20 @@
                     data.options.pageData = queryStringToObject( hs.search );
                 }
 
-                console.log("hrefnosearch: " + hs.hrefnosearch);
-                console.log("hash: " + hs.hash);
-                console.log("search: " + hs.search);
-                console.log(data);
+                $.mobile.activePageData = (data && data.options && data.options.pageData)
+                    ? data.options.pageData
+                    : null;
+                ignoreNextHashChange = true;
             });
             
             $( window ).bind( "hashchange", function( e ) {
-                console.log("hashchange");
-                console.log($.mobile.path.parseLocation().hash);
-                $.mobile.changePage( $.mobile.path.parseLocation().hash );
+                if (!ignoreNextHashChange) {
+                    $.mobile.changePage( $.mobile.path.parseLocation().hash , { 
+                        allowSamePageTransition: true,
+                        transition: "none"
+                    });
+                }
+                ignoreNextHashChange = false;
             });
 
             var map;
@@ -201,6 +201,10 @@
             $(document).ready( function() {
                 $.mobile.defaultHomeScroll=0;
             });
+
+            $(document).live("pagebeforeshow", function (e, data) {
+                console.log( $.mobile.activePageData );
+            });
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
     </head>
@@ -224,7 +228,7 @@
         
         <div data-role="page" id="listpage" data-theme="b">
              <div data-role="header">
-                <h1>OpenWiFiMap&nbsp;&ndash;&nbsp;List</h1>
+                <h1>OpenWiFiMap &ndash; List</h1>
             </div>
             <div data-role="content">       
                 <ul data-role="listview">
@@ -249,7 +253,7 @@
         
         <div data-role="page" id="detailpage" data-theme="b">
              <div data-role="header">
-                <h1>OpenWiFiMap&nbsp;&ndash;&nbsp;Details</h1>
+                <h1>OpenWiFiMap &ndash; Details</h1>
             </div>
             <div data-role="content">       
                 <p>I need some serious detailed content here!</p>
