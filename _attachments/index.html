@@ -79,8 +79,9 @@
                 if (!data.options.dataUrl) {
                     data.options.dataUrl = data.toPage;
                 }
+
+                data.toPage = hs.hrefnosearch + "#" + hs.hash;
                 if (hs.search) {
-                    data.toPage = hs.hrefnosearch + "#" + hs.hash;
                     data.options.pageData = queryStringToObject( hs.search );
                 }
 
