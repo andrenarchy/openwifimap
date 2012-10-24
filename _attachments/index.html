@@ -190,14 +190,20 @@
                 getNodesBBOX(bboxstr, function (){
                     currentnodes.nodes.forEach( function(row) {
                         lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, map.getProjectionObject());
-                        if (mapnodes.hasOwnProperty(row.id)) {
+                        console.log(mapnodes);
+                        if (mapnodes[row.id] && !mapnodes[row.id].marker.lonlat.equals(lonlat) ) {
                             markers.removeMarker(mapnodes[row.id].marker);
-                        } 
-                        mapnodes[row.id] = {
-                            value: row.value,
-                            marker: new OpenLayers.Marker(lonlat, icon.clone())
-                        };
-                        markers.addMarker( mapnodes[row.id].marker );
+                            delete mapnodes[row.id];
+                        }
+
+                        if (mapnodes[row.id]) {
+                            marker = mapnodes[row.id].marker;
+                        } else {
+                            mapnodes[row.id] = {};
+                            marker = new OpenLayers.Marker(lonlat, icon.clone());
+                            markers.addMarker( marker );
+                        }
+                        $.extend( mapnodes[row.id], row, { marker: marker} );
                     });
                     $("a#listlink .ui-btn-text").text("List (" + currentnodes.nodes.length + ")" );
                 });
