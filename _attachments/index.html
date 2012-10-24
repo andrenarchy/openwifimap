@@ -190,7 +190,6 @@
                 getNodesBBOX(bboxstr, function (){
                     currentnodes.nodes.forEach( function(row) {
                         lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, map.getProjectionObject());
-                        console.log(mapnodes);
                         if (mapnodes[row.id] && !mapnodes[row.id].marker.lonlat.equals(lonlat) ) {
                             markers.removeMarker(mapnodes[row.id].marker);
                             delete mapnodes[row.id];
