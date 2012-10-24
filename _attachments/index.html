@@ -2,13 +2,13 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <!--link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.css" /-->
-        <link rel="stylesheet" href="external/jqm/jquery.mobile-1.2.0.css" />
-        <!--link rel="stylesheet" href="http://www.openlayers.org/api/theme/default/style.css" /-->
-        <link rel="stylesheet" href="external/openlayers/style.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.css" />
+        <!--link rel="stylesheet" href="external/jqm/jquery.mobile-1.2.0.css" /-->
+        <link rel="stylesheet" href="http://www.openlayers.org/api/theme/default/style.css" />
+        <!--link rel="stylesheet" href="external/openlayers/style.css" /-->
         <link rel="stylesheet" href="style.css" />
-        <!--script src="http://code.jquery.com/jquery-1.8.2.js"></script-->
-        <script src="external/jqm/jquery-1.8.2.js"></script>
+        <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+        <!--script src="external/jqm/jquery-1.8.2.js"></script-->
         <script>
             $(document).bind("mobileinit", function(){
                 $.mobile.hashListeningEnabled = false;
@@ -16,14 +16,13 @@
                 $.mobile.defaultHomeScroll = 0;
             });
         </script>
-        <!--script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.js"></script-->
-        <script src="external/jqm/jquery.mobile-1.2.0.js"></script>
-        <!--script src="http://raw.github.com/dreamerslab/jquery.actual/master/jquery.actual.js"></script-->
-        <script src="external/jqm/jquery.actual.js"></script>
-        <!--script src="http://www.openlayers.org/api/OpenLayers.js"></script-->
-        <script src="external/openlayers/OpenLayers.js"></script>
-        <!--script src="http://raw.github.com/janl/mustache.js/master/mustache.js"></script-->
-        <script src="external/mustache/mustache.js"></script>
+        <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.js"></script>
+        <!--script src="external/jqm/jquery.mobile-1.2.0.js"></script-->
+        <script src="http://raw.github.com/dreamerslab/jquery.actual/master/jquery.actual.js"></script>
+        <!--script src="external/jqm/jquery.actual.js"></script-->
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+        <!--script src="external/openlayers/OpenLayers.js"></script-->
+        <script src="external/icanhaz/ICanHaz.js"></script>
         <script>
             //////////////////////////////////////////////////////////
             // jquery mobile page + parameter handling
@@ -111,16 +110,16 @@
             });
 
             // fix height of content
-            function fixContentHeight(newPageID) {
+            function fixContentHeight(e) {
                 var currentPageID = $.mobile.activePage == null ? defaultPage : $.mobile.activePage.attr('id'),
                 footer = $("div#" + currentPageID + " > div[data-role='footer']"),
                 header = $("div#" + currentPageID + " > div[data-role='header']"),
                 content = $("div#" + currentPageID + " > div[data-role='content']"),
                 viewHeight = $(window).height(),
-                contentHeight = viewHeight - header.actual('outerHeight') - footer.actual('outerHeight');
-                if (content.actual('outerHeight') + header.actual('outerHeight') + footer.actual('outerHeight') !== viewHeight) {
-                    contentHeight -= (content.actual('outerHeight') - content.actual('height') /*+1*/ );
-                    content.height(contentHeight);
+                newContentHeight = viewHeight - header.actual('outerHeight') - footer.actual('outerHeight');
+                newContentHeight -= (content.actual('outerHeight') - content.actual('height') + 1 );
+                if (newContentHeight != content.actual('height')) {
+                    content.height(newContentHeight);
                 }
             }
 
@@ -129,7 +128,7 @@
 
             //TODO: remove!
             $(document).live("pagebeforeshow", function (e, data) {
-                console.log( $.mobile.activePageData );
+                //console.log( $.mobile.activePageData );
             });
 
             //////////////////////////////////////////////////////////
@@ -142,30 +141,23 @@
                 if (currentnodes.bbox == bboxstr) {
                     success();
                 } else {
-                    $.ajax({
-                        url: '_spatial/nodes',
-                        dataType: 'json',
-                        data: {
-                            "bbox": bboxstr
-                        },
-                        success: function(data){
+                    $.getJSON('_spatial/nodes', { "bbox": bboxstr }, function(data) {
                             if (data.rows && $.isArray(data.rows)) {
                                 // store nodes in object 'nodes'
                                 currentnodes.bbox = bboxstr;
                                 currentnodes.nodes = [];
                                 data.rows.forEach( function(row) {
                                     if (row.id && row.geometry && row.geometry.coordinates && row.value) {
-                                        currentnodes.nodes.push(row);
+                                        newnode = row.value;
+                                        delete row.value;
+                                        $.extend( newnode, row );
+                                        currentnodes.nodes.push(newnode);
                                     }
                                 });
                                 success();
                                 // TODO: find neighbours that are not yet in 'nodes'
                             }
-                        },
-                        error: function(jqXHR, textstatus, errorThrown) {
-                            console.log(textstatus);
-                        }
-                    });
+                        });
                 }
             }
 
@@ -194,7 +186,7 @@
             function handleBBOX(bboxstr) {
                 ignoreNextHashChange = true;
                 window.location.hash = "#mappage?bbox=" + bboxstr;
-                $("a#listpage").attr("href", "#listpage?bbox=" + bboxstr);
+                $("a#listlink").attr("href", "#listpage?bbox=" + bboxstr);
                 getNodesBBOX(bboxstr, function (){
                     currentnodes.nodes.forEach( function(row) {
                         lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, map.getProjectionObject());
@@ -207,7 +199,7 @@
                         };
                         markers.addMarker( mapnodes[row.id].marker );
                     });
-                    $("a#listpage .ui-btn-text").text("List (" + currentnodes.nodes.length + ")" );
+                    $("a#listlink .ui-btn-text").text("List (" + currentnodes.nodes.length + ")" );
                 });
             }
 
@@ -242,14 +234,13 @@
                 } else {
                     initMap();
                     if (!bbox) {
-                        console.log("bla");
                         map.zoomToMaxExtent();
                         getPosition();
                     }
                 }
 
                 if (bbox) {
-                    console.log(bbox.toString());
+                    /*
                     // nasty hack: shrink the bbox a bit, so we don't zoom out
                     w = bbox.getWidth();
                     h = bbox.getHeight();
@@ -258,7 +249,9 @@
                     bbox.right -= eps*w;
                     bbox.bottom += eps*h;
                     bbox.top -= eps*h;
-                    map.zoomToExtent(bbox.transform( epsg4326, map.getProjectionObject() ));
+                    */
+                    // might zoom out a bit without nasty hack ;)
+                    map.zoomToExtent(bbox.transform( epsg4326, map.getProjectionObject() ), true);
                 }
             }
 
@@ -285,6 +278,44 @@
             }
             
             $('#mappage').live('pageshow', showMap);
+
+            //////////////////////////////////////////////////////////
+            // list page
+            $('#listpage').live('pagebeforeshow', function (){
+                bbox = null;
+                if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
+                    bbox = getBBOXfromString($.mobile.activePageData.bbox);
+                }
+                if (bbox) {
+                    $("a#maplink").attr("href", "#mappage?bbox=" + bbox.toString());
+                    getNodesBBOX(bbox.toBBOX(), function () {
+                        html = ich.mustnodes(currentnodes);
+                        $("#list").empty().append( ich.mustnodes(currentnodes) );
+                        var listul = $("#listul");
+                        if (listul.hasClass('ui-listview')) {
+                            listul.listview('refresh');
+                            } else {
+                            listul.listview();
+                            //listul.trigger('create');
+                        }
+                    });
+                } else {
+                    $("#list").empty().append("<p>No area selected! Go to the <a href=\"#mappage\">map</a> to select an area.</p>");
+                }
+            });
+        </script>
+        <script id="mustnodes" type="text/html">
+            <ul data-role="listview" id="listul">
+                {{#nodes}}
+                <li><a href="#detailpage?node={{id}}" data-transition="slide">
+                    <h3>{{hostname}}</h3>
+                    <p>
+                    {{#tags}}#{{.}} {{/tags}}
+                    {{^tags}}&nbsp;{{/tags}}
+                    </p>
+                </a></li>
+                {{/nodes}}
+            </ul>
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
     </head>
@@ -301,7 +332,7 @@
                 <div class="ui-grid-b">
                     <div class="ui-block-a"></div>
                     <div class="ui-block-b"></div>
-                    <div class="ui-block-c"><a id="listpage" href="#listpage?bbox=40,2,1&bla=12" data-transition="slide" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">List</a></div>
+                    <div class="ui-block-c"><a id="listlink" href="#listpage" data-transition="slide" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">List</a></div>
                 </div>
             </div>
         </div>
@@ -310,21 +341,11 @@
              <div data-role="header">
                 <h1>OpenWiFiMap &ndash; List</h1>
             </div>
-            <div data-role="content">       
-                <ul data-role="listview">
-                    <li><a href="#detailpage" data-transition="slide">
-                        <h3>liebknecht</h3>
-                        <p>#freifunk #accesspoint #mesh #olsr</p>
-                    </a></li>
-                    <li><a href="http://www.google.de" data-transition="slide">
-                        <h3>monument1</h3>
-                        <p>#freifunk #mesh #olsr</p>
-                    </a></li>
-                </ul>
+            <div id="list" data-role="content"> 
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a href="#mappage" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show map</button></a></div>
+                    <div class="ui-block-a"><a id="maplink" href="#mappage" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show map</button></a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>

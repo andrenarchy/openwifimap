@@ -4,7 +4,8 @@ function(doc) {
                 { type: "Point", coordinates: [doc.longitude, doc.latitude] }, 
                 {
                     id: doc._id,
-                    hostname: doc.hostname
+                    hostname: doc.hostname,
+                    tags: doc.tags
                 }
             );
     }
