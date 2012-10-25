@@ -134,17 +134,17 @@
             //////////////////////////////////////////////////////////
             // general functions
             var currentnodes = { 
-                bbox: null, // contains bboxstr
+                curbbox: null, // contains bboxstr
                 nodes: []   // node list
             };
             function getNodesBBOX(bboxstr, success) {
-                if (currentnodes.bbox == bboxstr) {
+                if (currentnodes.curbbox == bboxstr) {
                     success();
                 } else {
                     $.getJSON('_spatial/nodes', { "bbox": bboxstr }, function(data) {
                             if (data.rows && $.isArray(data.rows)) {
                                 // store nodes in object 'nodes'
-                                currentnodes.bbox = bboxstr;
+                                currentnodes.curbbox = bboxstr;
                                 currentnodes.nodes = [];
                                 data.rows.forEach( function(row) {
                                     if (row.id && row.geometry && row.geometry.coordinates && row.value) {
@@ -294,14 +294,12 @@
                 if (bbox) {
                     $("a#maplink").attr("href", "#map?bbox=" + bbox.toString());
                     getNodesBBOX(bbox.toBBOX(), function () {
-                        html = ich.mustnodes(currentnodes);
-                        $("#listdiv").empty().append( ich.mustnodes(currentnodes) );
+                        $("#listdiv").empty().append( ich.listmust(currentnodes) );
                         var listul = $("#listul");
                         if (listul.hasClass('ui-listview')) {
                             listul.listview('refresh');
-                            } else {
+                        } else {
                             listul.listview();
-                            //listul.trigger('create');
                         }
                     });
                 } else {
@@ -312,13 +310,37 @@
             //////////////////////////////////////////////////////////
             // detail page
             $('#detail').live('pagebeforeshow', function (){
+                bbox = null;
+                if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
+                    bbox = getBBOXfromString($.mobile.activePageData.bbox);
+                }
+                if (bbox) {
+                    $("a#detailback").attr("href", "#list?bbox=" + bbox.toString() );
+                    $("a#detailback .ui-btn-text").text("List");
+                } else {
+                    $("a#detailback").attr("href", "#map" );
+                    $("a#detailback .ui-btn-text").text("Map");
+                }
+
+                node = null;
+                if ($.mobile.activePageData && $.mobile.activePageData.node && (typeof $.mobile.activePageData.node == "string")) {
+                    node = $.mobile.activePageData.node;
+                }
+                if (node) {
+                    $.getJSON('/openwifimap/' + node, {}, function(data) {
+                            console.log(data);
+                            $("#detaildiv").empty().append( ich.detailmust(data) ).trigger('create');
+                        });
+                } else {
+                    $("#detaildiv").empty().append("<p>No node selected! Go to the <a href=\"#map\">map</a> to select an area.</p>");
+                }
             });
 
         </script>
-        <script id="mustnodes" type="text/html">
+        <script id="listmust" type="text/html">
             <ul data-role="listview" id="listul">
                 {{#nodes}}
-                <li><a href="#detail?node={{id}}" data-transition="slide">
+                <li><a href="#detail?node={{id}}&bbox={{curbbox}}" data-transition="slide">
                     <h3>{{hostname}}</h3>
                     <p>
                     {{#tags}}#{{.}} {{/tags}}
@@ -327,6 +349,14 @@
                 </a></li>
                 {{/nodes}}
             </ul>
+        </script>
+        <script id="detailmust" type="text/html">
+            <h2>{{hostname}}</h2>
+            <h3>Location</h3>
+            <div data-role="collapsible">
+                <h3>Map</h3>
+                <p>blabla</p>
+            </div>
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
     </head>
@@ -356,7 +386,7 @@
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a id="maplink" href="#map" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show map</button></a></div>
+                    <div class="ui-block-a"><a id="maplink" href="#map" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Map</button></a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>
@@ -367,12 +397,11 @@
              <div data-role="header">
                 <h1>OpenWiFiMap &ndash; Details</h1>
             </div>
-            <div data-role="content">       
-                <p>I need some serious detailed content here!</p>
+            <div id="detaildiv" data-role="content">
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a href="#list" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">List</button></a></div>
+                    <div class="ui-block-a"><a id="detailback" href="#map" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Map</button></a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>
