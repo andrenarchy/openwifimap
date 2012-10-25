@@ -352,11 +352,23 @@
         </script>
         <script id="detailmust" type="text/html">
             <h2>{{hostname}}</h2>
-            <h3>Location</h3>
-            <div data-role="collapsible">
-                <h3>Map</h3>
-                <p>blabla</p>
-            </div>
+            <!--div data-role="collapsible-set"-->
+                <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-collapsed="false">
+                    <h3>Map</h3>
+                    <p>TODO: show map with center {{latitude}},{{longitude}}</p>
+                </div>
+                <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                    <h3>Network interfaces</h3>
+                    {{#interfaces}}
+                    <h4>{{name}}</h4>
+                    <p>IPv4 addresses:
+                        {{#ipv4Addresses}}
+                        {{.}}
+                        {{/ipv4Addresses}}
+                    </p>
+                    {{/interfaces}}
+                </div>
+            <!--/div-->
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
     </head>
