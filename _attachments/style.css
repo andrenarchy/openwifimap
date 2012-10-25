@@ -1,4 +1,4 @@
-html, body, #content, #mappage, #map {
+html, body, #content, #map, #mapdiv {
     width: 100%; 
     height: 100%;
     padding: 0;

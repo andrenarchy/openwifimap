@@ -72,7 +72,7 @@
 
             var firstPage = true;
             var ignoreNextHashChange = false;
-            var defaultPage = "mappage";
+            var defaultPage = "map";
             $( document ).bind( "pagebeforechange", function( e, data ) {
                 var hs;
                 if (firstPage) {
@@ -163,7 +163,7 @@
 
             //////////////////////////////////////////////////////////
             // map page
-            var map;
+            var map = null;
             var mapnodes = { };
             var markers;
             var position;
@@ -185,8 +185,8 @@
 
             function handleBBOX(bboxstr) {
                 ignoreNextHashChange = true;
-                window.location.hash = "#mappage?bbox=" + bboxstr;
-                $("a#listlink").attr("href", "#listpage?bbox=" + bboxstr);
+                window.location.hash = "#map?bbox=" + bboxstr;
+                $("a#listlink").attr("href", "#list?bbox=" + bboxstr);
                 getNodesBBOX(bboxstr, function (){
                     currentnodes.nodes.forEach( function(row) {
                         lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, map.getProjectionObject());
@@ -210,7 +210,7 @@
 
             function initMap() {
                 // create map
-                map = new OpenLayers.Map('map');
+                map = new OpenLayers.Map('mapdiv');
                 map.addLayer(new OpenLayers.Layer.OSM());
                 markers = new OpenLayers.Layer.Markers( "Markers" );
                 map.addLayer(markers);
@@ -234,7 +234,7 @@
                     bbox = getBBOXfromString($.mobile.activePageData.bbox);
                 }
 
-                if (window.map && window.map instanceof OpenLayers.Map) {
+                if (map) {
                     map.updateSize();
                 } else {
                     initMap();
@@ -282,20 +282,20 @@
                 }
             }
             
-            $('#mappage').live('pageshow', showMap);
+            $('#map').live('pageshow', showMap);
 
             //////////////////////////////////////////////////////////
             // list page
-            $('#listpage').live('pagebeforeshow', function (){
+            $('#list').live('pagebeforeshow', function (){
                 bbox = null;
                 if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
                     bbox = getBBOXfromString($.mobile.activePageData.bbox);
                 }
                 if (bbox) {
-                    $("a#maplink").attr("href", "#mappage?bbox=" + bbox.toString());
+                    $("a#maplink").attr("href", "#map?bbox=" + bbox.toString());
                     getNodesBBOX(bbox.toBBOX(), function () {
                         html = ich.mustnodes(currentnodes);
-                        $("#list").empty().append( ich.mustnodes(currentnodes) );
+                        $("#listdiv").empty().append( ich.mustnodes(currentnodes) );
                         var listul = $("#listul");
                         if (listul.hasClass('ui-listview')) {
                             listul.listview('refresh');
@@ -305,14 +305,20 @@
                         }
                     });
                 } else {
-                    $("#list").empty().append("<p>No area selected! Go to the <a href=\"#mappage\">map</a> to select an area.</p>");
+                    $("#listdiv").empty().append("<p>No area selected! Go to the <a href=\"#map\">map</a> to select an area.</p>");
                 }
             });
+
+            //////////////////////////////////////////////////////////
+            // detail page
+            $('#detail').live('pagebeforeshow', function (){
+            });
+
         </script>
         <script id="mustnodes" type="text/html">
             <ul data-role="listview" id="listul">
                 {{#nodes}}
-                <li><a href="#detailpage?node={{id}}" data-transition="slide">
+                <li><a href="#detail?node={{id}}" data-transition="slide">
                     <h3>{{hostname}}</h3>
                     <p>
                     {{#tags}}#{{.}} {{/tags}}
@@ -326,38 +332,38 @@
     </head>
 
     <body>
-        <div data-role="page" data-theme="b" id="mappage">
+        <div data-role="page" data-theme="b" id="map">
              <div data-role="header" id="header">
                 <h1>OpenWiFiMap</h1>
             </div>
             <div data-role="content" id="content">
-                <div id="map"></div>
+                <div id="mapdiv"></div>
             </div>
             <div data-role="footer" id="footer">
                 <div class="ui-grid-b">
                     <div class="ui-block-a"></div>
                     <div class="ui-block-b"></div>
-                    <div class="ui-block-c"><a id="listlink" href="#listpage" data-transition="slide" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">List</a></div>
+                    <div class="ui-block-c"><a id="listlink" href="#list" data-transition="slide" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">List</a></div>
                 </div>
             </div>
         </div>
         
-        <div data-role="page" id="listpage" data-theme="b">
+        <div data-role="page" id="list" data-theme="b">
              <div data-role="header">
                 <h1>OpenWiFiMap &ndash; List</h1>
             </div>
-            <div id="list" data-role="content"> 
+            <div id="listdiv" data-role="content"> 
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a id="maplink" href="#mappage" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show map</button></a></div>
+                    <div class="ui-block-a"><a id="maplink" href="#map" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show map</button></a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>
             </div>
         </div>
         
-        <div data-role="page" id="detailpage" data-theme="b">
+        <div data-role="page" id="detail" data-theme="b">
              <div data-role="header">
                 <h1>OpenWiFiMap &ndash; Details</h1>
             </div>
@@ -366,7 +372,7 @@
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a href="#listpage" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Show list</button></a></div>
+                    <div class="ui-block-a"><a href="#list" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">List</button></a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>
