@@ -1,0 +1,42 @@
+[
+    {
+        "from": "",
+        "to": "index.html"
+    },
+    {
+        "from": "favicon.ico",
+        "to": "favicon.ico"
+    },
+    {
+        "from": "style/*",
+        "to": "style/*"
+    },
+    {
+        "from": "external/*",
+        "to": "external/*"
+    },
+    {
+        "from": "_view/*",
+        "to": "_view/*"
+    },
+    {
+        "from": "_spatial/*",
+        "to": "_spatial/*"
+    },
+    {
+        "from": "script/*",
+        "to": "script/*"
+    },
+    {
+        "from": "images/*",
+        "to": "images/*"
+    },
+    {
+        "from": "openwifimap",
+        "to": "../../"
+    },
+    {
+        "from": "openwifimap/*",
+        "to": "../../*"
+    }
+]
