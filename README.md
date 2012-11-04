@@ -1,6 +1,6 @@
 # openwifimap
 
-map for WiFi router (freifunk and perhaps others, too!)
+A map for free network WiFi routers (freifunk and perhaps others, too!). Visit the instance running at [openwifimap.iriscouch.com](http://openwifimap.iriscouch.com).
 
 # Installation
 
