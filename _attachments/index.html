@@ -386,9 +386,29 @@
             </div>
             <div data-role="footer" id="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"></div>
+                    <div class="ui-block-a">
+                        <a href="#about" data-role="button" data-rel="popup" data-position-to="window" data-transition="fade" data-mini="false">About</a>
+                        <div data-role="popup" id="about" data-theme="b" data-overlay-theme="a">
+                            <div data-role="header">
+                                <h1>About</h1>
+                            </div>
+                            <div data-role="content" style="max-width: 400px;">
+                                <p>OpenWiFiMap is
+                                <ul>
+                                    <li>free software licensed under the MIT License.</li>
+                                    <li>available at <a href="https://github.com/andrenarchy/openwifimap">github</a>. Please submit code, bug reports or ideas for improvements there!</li>
+                                    <li>meant to support free networks (free as in 'free speech', not 'free beer') like <a href="http://www.freifunk.net">freifunk</a>.</li>
+                                    <li>a <a href="http://couchapp.org/page/index">CouchApp</a> and you can thus easily run your own instance by pushing it to your CouchDB server.</li>
+                                    <li>inspired by the <a href="http://heartbeat.basicinside.de/">Freifunk heartbeat site</a>.</li>
+                                    <li>written by <a href="http://page.math.tu-berlin.de/~gaul">Andr&eacute; Gaul</a>.</li>
+                                </ul>
+                                </p>
+                                <a data-role="button" onclick="$('#about').popup( 'close' )" data-theme="b">Close</a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="ui-block-b"></div>
-                    <div class="ui-block-c"><a id="listlink" href="#list" data-transition="slide" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">List</a></div>
+                    <div class="ui-block-c"><a id="listlink" href="#list" data-role="button" data-transition="slide" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-mini="false">List</a></div>
                 </div>
             </div>
         </div>
@@ -401,7 +421,7 @@
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a id="maplink" href="#map" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Map</button></a></div>
+                    <div class="ui-block-a"><a id="maplink" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>
@@ -409,14 +429,14 @@
         </div>
         
         <div data-role="page" id="detail" data-theme="b">
-             <div data-role="header">
+            <div data-role="header">
                 <h1>OpenWiFiMap &ndash; Details</h1>
             </div>
             <div id="detaildiv" data-role="content">
             </div>
             <div data-role="footer">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a id="detailback" href="#map" data-transition="slide" data-direction="reverse"><button type="button" data-theme="b" data-icon="arrow-l" data-iconpos="left">Map</button></a></div>
+                    <div class="ui-block-a"><a id="detailback" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</button></a></div>
                     <div class="ui-block-b"></div>
                     <div class="ui-block-c"></div>
                 </div>
