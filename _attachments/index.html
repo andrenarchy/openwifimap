@@ -162,13 +162,61 @@
             }
 
             //////////////////////////////////////////////////////////
-            // map page
-            var map = null;
-            var mapnodes = { };
-            var markers;
-            var position;
-            var icon;
+            // map widget
+
             var epsg4326 = new OpenLayers.Projection("EPSG:4326");
+
+            function mapWidget(divId, onBboxChange, onNodeUpdate) {
+                this.map = new OpenLayers.Map(divId);
+                this.map.widget = this;
+                this.map.addLayer(new OpenLayers.Layer.OSM());
+                this.markers = new OpenLayers.Layer.Markers( "Markers" );
+                this.map.addLayer(this.markers);
+                this.nodes = {};
+
+                // create icon
+                var size = new OpenLayers.Size(21,25);
+                var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+                //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+                this.icon = new OpenLayers.Icon('external/openlayers/marker.png', size, offset);
+
+                this.processNode = function(row) {
+                    lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, this.map.getProjectionObject());
+                    if (this.nodes[row.id] && !this.nodes[row.id].marker.lonlat.equals(lonlat) ) {
+                        this.markers.removeMarker(this.nodes[row.id].marker);
+                        delete this.nodes[row.id];
+                    }
+
+                    if (this.nodes[row.id]) {
+                        marker = this.nodes[row.id].marker;
+                    } else {
+                        this.nodes[row.id] = {};
+                        marker = new OpenLayers.Marker(lonlat, this.icon.clone());
+                        this.markers.addMarker( marker );
+                    }
+                    $.extend( this.nodes[row.id], row, { marker: marker} );
+                }
+
+                this.handleNodeupdate = function() {
+                    currentnodes.nodes.forEach( this.processNode.bind(this) );
+                    onNodeUpdate();
+                };
+
+                this.handleMoveend = function() {
+                    bboxstr = this.getExtent().transform(this.getProjectionObject(), epsg4326).toBBOX();
+                    onBboxChange(bboxstr);
+                    getNodesBBOX(bboxstr, this.widget.handleNodeupdate.bind(this.widget));
+                };
+
+                // move handler
+                this.map.events.register('moveend', this.map, this.handleMoveend);
+            }
+
+
+            //////////////////////////////////////////////////////////
+            // map page
+            var mappagemap = null;
+            var position;
 
             function getBBOXfromString(str) {
                 bbox = OpenLayers.Bounds.fromString(str);
@@ -183,88 +231,21 @@
                 return valid ? bbox : null;
             }
 
-            function handleBBOX(bboxstr) {
+            function mappageOnBboxChange(bboxstr) {
                 ignoreNextHashChange = true;
                 window.location.hash = "#map?bbox=" + bboxstr;
                 $("a#listlink").attr("href", "#list?bbox=" + bboxstr);
-                getNodesBBOX(bboxstr, function (){
-                    currentnodes.nodes.forEach( function(row) {
-                        lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, map.getProjectionObject());
-                        if (mapnodes[row.id] && !mapnodes[row.id].marker.lonlat.equals(lonlat) ) {
-                            markers.removeMarker(mapnodes[row.id].marker);
-                            delete mapnodes[row.id];
-                        }
-
-                        if (mapnodes[row.id]) {
-                            marker = mapnodes[row.id].marker;
-                        } else {
-                            mapnodes[row.id] = {};
-                            marker = new OpenLayers.Marker(lonlat, icon.clone());
-                            markers.addMarker( marker );
-                        }
-                        $.extend( mapnodes[row.id], row, { marker: marker} );
-                    });
-                    $("a#listlink .ui-btn-text").text("List (" + currentnodes.nodes.length + ")" );
-                });
             }
 
-            function initMap() {
-                // create map
-                map = new OpenLayers.Map('mapdiv');
-                map.addLayer(new OpenLayers.Layer.OSM());
-                markers = new OpenLayers.Layer.Markers( "Markers" );
-                map.addLayer(markers);
-                var size = new OpenLayers.Size(21,25);
-                var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-                //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-                icon = new OpenLayers.Icon('external/openlayers/marker.png', size, offset);
-                map.events.register('moveend', map, 
-                    function () {
-                        handleBBOX( map.getExtent().transform(map.getProjectionObject(), epsg4326).toBBOX() );
-                    }
-                );
-            }
-
-
-            function showMap() {
-                fixContentHeight();
-
-                bbox = null;
-                if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
-                    bbox = getBBOXfromString($.mobile.activePageData.bbox);
-                }
-
-                if (map) {
-                    map.updateSize();
-                } else {
-                    initMap();
-                    if (!bbox) {
-                        map.zoomToMaxExtent();
-                        getPosition();
-                    }
-                }
-
-                if (bbox) {
-                    /*
-                    // nasty hack: shrink the bbox a bit, so we don't zoom out
-                    w = bbox.getWidth();
-                    h = bbox.getHeight();
-                    eps = 0.01;
-                    bbox.left += eps*w;
-                    bbox.right -= eps*w;
-                    bbox.bottom += eps*h;
-                    bbox.top -= eps*h;
-                    */
-                    // might zoom out a bit without nasty hack ;)
-                    map.zoomToExtent(bbox.transform( epsg4326, map.getProjectionObject() ), true);
-                }
+            function mappageOnNodeUpdate() {
+                $("a#listlink .ui-btn-text").text("List (" + currentnodes.nodes.length + ")" );
             }
 
             function showPosition(pos) {
                 position = pos;
                 var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
-                  .transform( new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject() );
-                map.setCenter(lonlat, 13);
+                  .transform( new OpenLayers.Projection("EPSG:4326"), mappagemap.map.getProjectionObject() );
+                mappagemap.map.setCenter(lonlat, 13);
             }
 
             function showPositionHigh(pos) {
@@ -281,8 +262,40 @@
                     navigator.geolocation.getCurrentPosition(showPositionLow, null, {timeout: 5000, enableHighAccuracy: false});
                 }
             }
-            
-            $('#map').live('pageshow', showMap);
+
+            $('#map').live('pageshow', function() {
+                fixContentHeight();
+
+                bbox = null;
+                if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
+                    bbox = getBBOXfromString($.mobile.activePageData.bbox);
+                }
+
+                if (mappagemap) {
+                    mappagemap.map.updateSize();
+                } else {
+                    mappagemap = new mapWidget('mapdiv', mappageOnBboxChange, mappageOnNodeUpdate);
+                    if (!bbox) {
+                        mappagemap.map.zoomToMaxExtent();
+                        getPosition();
+                    }
+                }
+
+                if (bbox) {
+                    /*
+                    // nasty hack: shrink the bbox a bit, so we don't zoom out
+                    w = bbox.getWidth();
+                    h = bbox.getHeight();
+                    eps = 0.01;
+                    bbox.left += eps*w;
+                    bbox.right -= eps*w;
+                    bbox.bottom += eps*h;
+                    bbox.top -= eps*h;
+                    */
+                    // might zoom out a bit without nasty hack ;)
+                    mappagemap.map.zoomToExtent(bbox.transform( epsg4326, mappagemap.map.getProjectionObject() ), true);
+                }
+            });
 
             //////////////////////////////////////////////////////////
             // list page
@@ -309,6 +322,9 @@
 
             //////////////////////////////////////////////////////////
             // detail page
+            var detailpagemap = null;
+            var datapending = true;
+
             $('#detail').live('pagebeforeshow', function (){
                 bbox = null;
                 if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
@@ -326,10 +342,14 @@
                 if ($.mobile.activePageData && $.mobile.activePageData.node && (typeof $.mobile.activePageData.node == "string")) {
                     node = $.mobile.activePageData.node;
                 }
+                detailpagemap = null;
                 if (node) {
                     $.getJSON('/openwifimap/' + node, {}, function(data) {
-                            console.log(data);
                             $("#detaildiv").empty().append( ich.detailmust(data) ).trigger('create');
+                            if (!detailpagemap) {
+                                detailpagemap = new mapWidget('detailmap', function(){}, function(){});
+                                detailpagemap.map.zoomToMaxExtent();
+                            }
                         });
                 } else {
                     $("#detaildiv").empty().append("<p>No node selected! Go to the <a href=\"#map\">map</a> to select an area.</p>");
@@ -355,6 +375,8 @@
             <!--div data-role="collapsible-set"-->
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-collapsed="false">
                     <h3>Map</h3>
+                    <div id="detailmap" style="height:200px; width: 200px">
+                    </div>
                     <p>TODO: show map with center {{latitude}},{{longitude}}</p>
                 </div>
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
