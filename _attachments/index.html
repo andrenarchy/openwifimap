@@ -117,7 +117,7 @@
                 content = $("div#" + currentPageID + " > div[data-role='content']"),
                 viewHeight = $(window).height(),
                 newContentHeight = viewHeight - header.actual('outerHeight') - footer.actual('outerHeight');
-                newContentHeight -= (content.actual('outerHeight') - content.actual('height') + 1 );
+                newContentHeight -= (content.actual('outerHeight') - content.actual('height') /*+ 1*/ );
                 if (newContentHeight != content.actual('height')) {
                     content.height(newContentHeight);
                 }
