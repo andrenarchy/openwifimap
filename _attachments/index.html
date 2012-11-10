@@ -373,6 +373,9 @@
                             var lonlat = new OpenLayers.LonLat(data.longitude, data.latitude)
                                 .transform( new OpenLayers.Projection("EPSG:4326"), detailpagemap.map.getProjectionObject() );
                             detailpagemap.map.setCenter(lonlat, 16);
+                            $("#detailmapcenter").click( function () {
+                                detailpagemap.map.setCenter(lonlat, 16);
+                            });
                         });
                 } else {
                     $("#detaildiv").empty().append("<p>No node selected! Go to the <a href=\"#map\">map</a> to select an area.</p>");
@@ -408,6 +411,7 @@
                                 {{addressZip}} {{addressCity}}<br/>
                                 {{addressCountry}}
                             </p>
+                            <a id="detailmapcenter" data-role="button">Center map</a>
                         </div></div>
                     </div>
                 </div>
