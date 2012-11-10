@@ -420,22 +420,28 @@
                     {{#interfaces}}
                     <div data-role="collapsible" data-theme="c" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
                         <h4>{{name}}</h4>
-                        <div class="ui-grid-a">
-                            <div class="ui-block-a">IPv4 addresses</div>
-                            <div class="ui-block-b">
-                                {{#ipv4Addresses}}
-                                {{.}}<br />
-                                {{/ipv4Addresses}}
-                            </div>
-                        </div>
-                        <div class="ui-grid-a">
-                            <div class="ui-block-a">IPv6 addresses</div>
-                            <div class="ui-block-b">
-                                {{#ipv6Addresses}}
-                                {{.}}<br />
-                                {{/ipv6Addresses}}
-                            </div>
-                        </div>
+                        <table class="fifty">
+                            <tr>
+                                <td>IPv4 addresses</td>
+                                <td>
+                                    {{#ipv4Addresses}}
+                                    {{.}}<br />
+                                    {{/ipv4Addresses}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>IPv6 addresses</td>
+                                <td>
+                                    {{#ipv6Addresses}}
+                                    {{.}}<br />
+                                    {{/ipv6Addresses}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>MAC address</td>
+                                <td>{{macAddress}}</td>
+                            </tr>
+                        </table>
                     </div>
                     {{/interfaces}}
                 </div>
