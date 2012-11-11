@@ -16,3 +16,8 @@ html, body, #content, #map, #mapdiv {
 
 table { width:100%; }
 table.fifty td { vertical-align:top; padding:6px; width: 50%; } 
+
+#avatar {
+    max-width: 150px;
+    max-height: 150px;
+}

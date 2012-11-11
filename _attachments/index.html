@@ -361,11 +361,25 @@
                             if (detailpagemap) {
                                 mapdiv = $("#detailmap").detach();
                             }
+                            // i can haz detailed data?
                             $("#detaildiv").empty().append( ich.detailmust(data) ).trigger('create');
+
+                            // i can haz avatar?
+                            var avatarurl = null;
+                            if (data._attachments) {
+                                Object.keys(data._attachments).forEach( function(key) {
+                                    // limit avatars to 150kB
+                                    if ( (/^avatar\.(png|jpg)$/).test(key) && data._attachments[key].length<150000) {
+                                        avatarurl = "/openwifimap/" + data._id + "/" + key;
+                                    }
+                                });
+                            }
+                            if (avatarurl) {
+                                $("#avatardiv").empty().append( '<img id="avatar" src="' + avatarurl + '" />' );
+                            }
+
                             if (!detailpagemap) {
-                                console.log(data);
                                 detailpagemap = new mapWidget('detailmap', function(){}, function(){});
-                                console.log('new map');
                             } else {
                                 $("#detailmapcontainer").empty().append(mapdiv);
                             }
@@ -397,6 +411,7 @@
             </ul>
         </script>
         <script id="detailmust" type="text/html">
+            <div id="avatardiv"></div>
             <h2>{{hostname}}</h2>
             <!--div data-role="collapsible-set"-->
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-collapsed="false">
@@ -404,22 +419,25 @@
                     <div class="ui-grid-a">
                         <div class="ui-block-a" id="detailmapcontainer"><div id="detailmap"></div></div>
                         <div class="ui-block-b"><div class="ui-bar">
-                            <h4>Address</h4>
                             <p>
+                            {{#address}}
+                                <h4>Address</h4>
                                 {{placeName}}<br />
-                                {{addressStreet}}<br/>
-                                {{addressZip}} {{addressCity}}<br/>
-                                {{addressCountry}}
+                                {{street}}<br/>
+                                {{zip}} {{city}}<br/>
+                                {{country}}
+                            {{/address}}
+                            {{^address}}No address is stored for this node.{{/address}}
                             </p>
                             <a id="detailmapcenter" data-role="button">Center map</a>
                         </div></div>
                     </div>
                 </div>
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-                    <h3>Network interfaces</h3>
+                    <h3>Network</h3>
                     {{#interfaces}}
                     <div data-role="collapsible" data-theme="c" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-                        <h4>{{name}}</h4>
+                        <h4>Interface {{name}}</h4>
                         <table class="fifty">
                             <tr>
                                 <td>IPv4 addresses</td>
@@ -444,7 +462,23 @@
                         </table>
                     </div>
                     {{/interfaces}}
+                    <table class="fifty">
+                        <tr>
+                            <td>IPv4 default Gateway</td>
+                            <td>{{ipv4defaultGateway}}</td>
+                        </tr>
+                        <tr>
+                            <td>IPv6 default Gateway</td>
+                            <td>{{ipv6defaultGateway}}</td>
+                        </tr>
+                    </table>
                 </div>
+                {{#firmware}}
+                <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                    <h3>Firmware</h3>
+                    {{name}} {{revision}} from <a href="{{url}}">{{url}}</a>
+                </div>
+                {{/firmware}}
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
                     <h3>...more stuff!</h3>
                 </div>
