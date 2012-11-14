@@ -18,6 +18,26 @@ table { width:100%; }
 table.fifty td { vertical-align:top; padding:6px; width: 50%; } 
 
 #avatar {
-    max-width: 150px;
-    max-height: 150px;
+    vertical-align: middle;
+    max-width: 60px;
+    max-height: 60px;
+    border-radius: 5px;
+}
+
+#avaframe {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    padding: 5px;
+    border: 1px solid #aaaaaa;
+    border-radius: 5px;
+    margin-right: 5px;
+    background-color: #eeeeee;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.titlecont h2 {
+    display: inline-block;
 }

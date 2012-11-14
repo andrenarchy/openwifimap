@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <!--link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.css" />
         <link rel="stylesheet" href="http://www.openlayers.org/api/theme/default/style.css" />
-        <script src="http://code.jquery.com/jquery-1.8.2.js"></script-->
-        <link rel="stylesheet" href="external/jqm/jquery.mobile-1.2.0.css"/>
+        <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+        <!--link rel="stylesheet" href="external/jqm/jquery.mobile-1.2.0.css"/>
         <link rel="stylesheet" href="external/openlayers/style.css" />
-        <script src="external/jqm/jquery-1.8.2.js"></script>
+        <script src="external/jqm/jquery-1.8.2.js"></script-->
 
         <link rel="stylesheet" href="style/style.css" />
         <script>
@@ -17,12 +17,12 @@
                 $.mobile.defaultHomeScroll = 0;
             });
         </script>
-        <!--script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.js"></script>
+        <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.js"></script>
         <script src="http://raw.github.com/dreamerslab/jquery.actual/master/jquery.actual.js"></script>
-        <script src="http://www.openlayers.org/api/OpenLayers.js"></script-->
-        <script src="external/jqm/jquery.mobile-1.2.0.js"></script>
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+        <!--script src="external/jqm/jquery.mobile-1.2.0.js"></script>
         <script src="external/jqm/jquery.actual.js"></script>
-        <script src="external/openlayers/OpenLayers.js"></script>
+        <script src="external/openlayers/OpenLayers.js"></script-->
 
         <script src="external/icanhaz/ICanHaz.js"></script>
         <script>
@@ -375,7 +375,7 @@
                                 });
                             }
                             if (avatarurl) {
-                                $("#avatardiv").empty().append( '<img id="avatar" src="' + avatarurl + '" />' );
+                                $("#avaframe").empty().append( '<img id="avatar" src="' + avatarurl + '" />' );
                             }
 
                             if (!detailpagemap) {
@@ -411,8 +411,10 @@
             </ul>
         </script>
         <script id="detailmust" type="text/html">
-            <div id="avatardiv"></div>
-            <h2>{{hostname}}</h2>
+            <div class="titlecont">
+                <div id="avaframe"></div>
+                <h2>{{hostname}}</h2>
+            </div>
             <!--div data-role="collapsible-set"-->
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-collapsed="false">
                     <h3>Map and address</h3>
