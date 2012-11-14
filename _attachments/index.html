@@ -184,6 +184,13 @@
                 //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
                 this.icon = new OpenLayers.Icon('external/openlayers/marker.png', size, offset);
 
+                // remove popups on click on map
+                this.map.events.register("click", this.map, function() {
+                    this.popups.forEach( (function(popup) {
+                        this.removePopup(popup);
+                    }).bind(this) );
+                });
+
                 this.processNode = function(row) {
                     lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, this.map.getProjectionObject());
                     if (this.nodes[row.id] && !this.nodes[row.id].marker.lonlat.equals(lonlat) ) {
@@ -196,6 +203,24 @@
                     } else {
                         this.nodes[row.id] = {};
                         marker = new OpenLayers.Marker(lonlat, this.icon.clone());
+                        marker.events.register("click", {
+                            widget: this,
+                            lonlat: lonlat,
+                            row: row
+                            },
+                            function () {
+                                popup = new OpenLayers.Popup.FramedCloud(
+                                    "popup",
+                                    this.lonlat,
+                                    null,
+                                    ich.mappopupmust(this.row, true),
+                                    null,
+                                    false,
+                                    null);
+                                this.widget.map.addPopup(popup, true);
+                                this.widget.popup = popup;
+                            }
+                        );
                         this.markers.addMarker( marker );
                     }
                     $.extend( this.nodes[row.id], row, { marker: marker} );
@@ -397,6 +422,9 @@
                 }
             });
 
+        </script>
+        <script id="mappopupmust" type="text/html">
+            <a href="#detail?node={{id}}" data-transition="slide">Show details of {{hostname}}</a>
         </script>
         <script id="listmust" type="text/html">
             <ul data-role="listview" id="listul">
