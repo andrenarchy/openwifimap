@@ -219,6 +219,8 @@
                                     false,
                                     null);
                                 this.widget.map.addPopup(popup, true);
+                                $("#mappopup").trigger('create');
+                                popup.updateSize();
                                 this.widget.popup = popup;
                             }
                         );
@@ -425,7 +427,9 @@
 
         </script>
         <script id="mappopupmust" type="text/html">
-            <a href="#detail?node={{id}}" data-transition="slide">Show details of {{hostname}}</a>
+            <div id="mappopup">
+                <a href="#detail?node={{id}}" data-role="button" data-transition="slide">{{hostname}}</a>
+            </div>
         </script>
         <script id="listmust" type="text/html">
             <ul data-role="listview" id="listul">
@@ -442,7 +446,9 @@
         </script>
         <script id="detailmust" type="text/html">
             <div class="titlecont">
-                <div id="avaframe"></div>
+                <div id="avaframe">
+                    <img id="avatar" src="images/wifi_icon60.png" />
+                </div>
                 <h2>{{hostname}}</h2>
             </div>
             <!--div data-role="collapsible-set"-->
