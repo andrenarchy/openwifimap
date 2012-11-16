@@ -180,10 +180,10 @@
                 this.nodes = {};
 
                 // create icon
-                var size = new OpenLayers.Size(21,25);
+                var size = new OpenLayers.Size(25,25);
                 var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
                 //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-                this.icon = new OpenLayers.Icon('external/openlayers/marker.png', size, offset);
+                this.icon = new OpenLayers.Icon('images/icon_wifi.png', size, offset);
 
                 // remove popups on click on map
                 this.map.events.register("click", this.map, function() {
