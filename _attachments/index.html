@@ -180,8 +180,8 @@
                 this.nodes = {};
 
                 // create icon
-                var size = new OpenLayers.Size(25,25);
-                var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+                var size = new OpenLayers.Size(100,100);
+                var offset = new OpenLayers.Pixel(-(size.w/2), -(size.h/2));
                 //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
                 this.icon = new OpenLayers.Icon('images/icon_wifi.png', size, offset);
 
@@ -203,7 +203,24 @@
                         marker = this.nodes[row.id].marker;
                     } else {
                         this.nodes[row.id] = {};
-                        marker = new OpenLayers.Marker(lonlat, this.icon.clone());
+                        var icon = this.icon.clone();
+                        icon.draw = function(px) {
+                            console.log(this.imageDiv);
+                            arcfun = function(cx, cy, r, start, aperture) {
+                                var startxy = [ Math.cos(start)*r, Math.sin(start)*r ],
+                                    endxy = [ Math.cos(start+aperture)*r - startxy[0], Math.sin(start+aperture)*r - startxy[1] ],
+                                    ret = '';
+                                ret += '<path d="M' + (cx) + ',' + (cy) + ' h' + startxy[0] + ' v' + startxy[1] + ' a' + r + ',' + r + ' ' + start + ' ' + ((aperture<Math.PI)? '0' : '1') +',1 ' + endxy[0] + ',' + endxy[1] + ' z' + '" fill="url(#grad1)" />';
+                                ret += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+startxy[0])+'" y2="'+(cy+startxy[1])+'" stroke="url(#gradline)" stroke-width="2" />';
+                                ret += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+endxy[0]+startxy[0])+'" y2="'+(cy+endxy[1]+startxy[1])+'" stroke="url(#gradline)" stroke-width="2" />';
+                                return ret;
+                            }
+                            console.log(this.size)
+                            $(this.imageDiv).children("img").replaceWith('<svg width="'+(this.size.w)+'" height="100"><defs><radialGradient id="grad1" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="40" fx="50" fy="50"><stop offset="20%" style="stop-color:rgb(100,100,255); stop-opacity:0.6" /><stop offset="80%" style="stop-color:rgb(100,100,255);stop-opacity:0" /></radialGradient></defs><defs><radialGradient id="gradline" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="40" fx="50" fy="50"><stop offset="0%" style="stop-color:rgb(0,0,255); stop-opacity:1" /><stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:0" /></radialGradient></defs>'+ arcfun(50, 50, 40, 1.55, 2) + '</svg>');
+                            this.moveTo(px);
+                            return this.imageDiv;
+                        };
+                        marker = new OpenLayers.Marker(lonlat, icon);
                         marker.events.register("click", {
                             widget: this,
                             lonlat: lonlat,
@@ -225,6 +242,7 @@
                             }
                         );
                         this.markers.addMarker( marker );
+
                     }
                     $.extend( this.nodes[row.id], row, { marker: marker} );
                 }
