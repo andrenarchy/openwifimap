@@ -211,6 +211,12 @@
                 return ich.mapiconsvg(data, true);
             }
 
+            function removePopups() {
+                this.popups.forEach( (function(popup) {
+                    this.removePopup(popup);
+                }).bind(this) );
+            };
+
             function mapWidget(divId, onBboxChange, onNodeUpdate) {
                 this.map = new OpenLayers.Map(divId);
                 this.map.widget = this;
@@ -218,6 +224,7 @@
                 this.markers = new OpenLayers.Layer.Markers( "Markers" );
                 this.map.addLayer(this.markers);
                 this.nodes = {};
+                this.popupid = null;
 
                 // create icon
                 var size = new OpenLayers.Size(100,100);
@@ -226,11 +233,7 @@
                 this.icon = new OpenLayers.Icon('images/icon_wifi.png', size, offset);
 
                 // remove popups on click on map
-                this.map.events.register("click", this.map, function() {
-                    this.popups.forEach( (function(popup) {
-                        this.removePopup(popup);
-                    }).bind(this) );
-                });
+                this.map.events.register("click", this.map, removePopups);
 
                 this.processNode = function(row) {
                     // skip if node already present
@@ -259,18 +262,23 @@
                             row: row
                             },
                             function () {
-                                popup = new OpenLayers.Popup.FramedCloud(
-                                    "popup",
-                                    this.lonlat,
-                                    null,
-                                    ich.mappopupmust(this.row, true),
-                                    null,
-                                    false,
-                                    null);
-                                this.widget.map.addPopup(popup, true);
-                                $("#mappopup").trigger('create');
-                                popup.updateSize();
-                                this.widget.popup = popup;
+                                if (this.widget.popupid == this.row["id"]) {
+                                    removePopups.bind(this.widget.map)();
+                                    this.widget.popupid = null;
+                                } else {
+                                    popup = new OpenLayers.Popup.FramedCloud(
+                                        "popup",
+                                        this.lonlat,
+                                        null,
+                                        ich.mappopupmust(this.row, true),
+                                        null,
+                                        false,
+                                        null);
+                                    this.widget.map.addPopup(popup, true);
+                                    $("#mappopup").trigger('create');
+                                    popup.updateSize();
+                                    this.widget.popupid = this.row["id"];
+                                }
                             }
                         );
                         this.markers.addMarker( marker );
