@@ -208,7 +208,8 @@
                             return ret;
                         })
                 }
-                return ich.mapiconsvg(data, true);
+                svg = ich.mapiconsvg(data, true);
+                return svg;
             }
 
             function removePopups() {
@@ -216,6 +217,11 @@
                     this.removePopup(popup);
                 }).bind(this) );
             };
+
+            function getIconSize(zoom) {
+                var len = Math.max(40, 175*Math.pow(0.8,18-zoom));
+                return size = new OpenLayers.Size(len, len);
+            }
 
             function mapWidget(divId, onBboxChange, onNodeUpdate) {
                 this.map = new OpenLayers.Map(divId);
@@ -227,13 +233,24 @@
                 this.popupid = null;
 
                 // create icon
-                var size = new OpenLayers.Size(100,100);
+                var size = getIconSize(this.map.getZoom());
                 var offset = new OpenLayers.Pixel(-(size.w/2), -(size.h/2));
                 //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-                this.icon = new OpenLayers.Icon('images/icon_wifi.png', size, offset);
+                this.icon = new OpenLayers.Icon('images/icon_wifi.png', size, null, function(s) {
+                    return new OpenLayers.Pixel( -s.w/2, -s.h/2 );
+                });
 
                 // remove popups on click on map
                 this.map.events.register("click", this.map, removePopups);
+
+                // resize markers on zoom
+                this.map.events.register("zoomend", this, function() {
+                    var size = getIconSize(this.map.getZoom());
+                    for (var i=0; i<this.markers.markers.length; i++) {
+                        this.markers.markers[i].icon.setSize(size);
+                    }
+
+                });
 
                 this.processNode = function(row) {
                     // skip if node already present
@@ -249,9 +266,11 @@
                     }
                     for (var i=0; i<row.antennas.length; i++) {
                         var icon = this.icon.clone();
+                        icon.antenna = row.antennas[i];
+                        icon.size = getIconSize(this.map.getZoom());
                         icon.draw = function(px) {
-                            svg = getAntennaSVG(100, 100, row.antennas[i]);
-                            $(this.imageDiv).children("img").replaceWith(svg);
+                            svg = getAntennaSVG(this.size.w, this.size.h, this.antenna);
+                            $(this.imageDiv).empty().append(svg);
                             this.moveTo(px);
                             return this.imageDiv;
                         };
