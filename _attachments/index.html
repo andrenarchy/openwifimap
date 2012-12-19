@@ -10,6 +10,11 @@
         <!--link rel="stylesheet" href="external/jqm/jquery.mobile-1.2.0.css"/>
         <link rel="stylesheet" href="external/openlayers/style.css" />
         <script src="external/jqm/jquery-1.8.2.js"></script-->
+        
+        <link rel="stylesheet" href="external/leaflet/leaflet.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="external/leaflet/leaflet.ie.css" />
+        <![endif]-->
 
         <link rel="stylesheet" href="style/style.css" />
         <script>
@@ -25,7 +30,8 @@
         <!--script src="external/jqm/jquery.mobile-1.2.0.js"></script>
         <script src="external/jqm/jquery.actual.js"></script>
         <script src="external/openlayers/OpenLayers.js"></script-->
-
+        
+        <script src="external/leaflet/leaflet-src.js"></script>
         <script src="external/icanhaz/ICanHaz.js"></script>
         <script>
             //////////////////////////////////////////////////////////
@@ -224,9 +230,31 @@
             }
 
             function mapWidget(divId, onBboxChange, onNodeUpdate) {
-                this.map = new OpenLayers.Map(divId);
+                //this.map = new OpenLayers.Map(divId);
+                this.map = L.map(divId);
+                L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
+                    key: 'e4e152a60cc5414eb81532de3d676261',
+                    styleId: 997,
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>'
+                }).addTo(this.map);
+
+                function onLocationFound(e) {
+                    var radius = e.accuracy / 2;
+                    console.log(e.latlng);
+                    L.marker(e.latlng).addTo(this.map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+                    L.circle(e.latlng, radius).addTo(this.map);
+                }
+
+                function onLocationError(e) {
+                    console.log(e.message);
+                }
+
+                this.map.on('locationfound', onLocationFound.bind(this));
+                this.map.on('locationerror', onLocationError.bind(this));
+                
+
                 this.map.widget = this;
-                this.map.addLayer(new OpenLayers.Layer.OSM());
+                /*this.map.addLayer(new OpenLayers.Layer.OSM());
                 this.markers = new OpenLayers.Layer.Markers( "Markers" );
                 this.map.addLayer(this.markers);
                 this.nodes = {};
@@ -317,6 +345,7 @@
 
                 // move handler
                 this.map.events.register('moveend', this.map, this.handleMoveend);
+                */
             }
 
 
@@ -326,16 +355,21 @@
             var position;
 
             function getBBOXfromString(str) {
-                bbox = OpenLayers.Bounds.fromString(str);
+                arr = str.split(',')
+                /*OpenLayers.Bounds.fromString(str);
                 arr = bbox.toArray();
                 var valid = false;
-                if ( arr.length == 4 ) {
+                */
+                if ( arr.length >= 4 ) {
                     valid = true;
-                    arr.forEach( function(el) {
-                        valid = valid ? isFinite(el) : false;
-                    });
+                    for ( i = 0; i < 4; i++ ) {
+                        arr[i] = parseFloat(arr[i]);
+                        valid = valid ? isFinite(arr[i]) : false;
+                    }
                 }
-                return valid ? bbox : null;
+                arr = [[arr[1],arr[0]],[arr[3],arr[2]]];
+                console.log(arr);
+                return valid ? arr : null;
             }
 
             function mappageOnBboxChange(bboxstr) {
@@ -383,8 +417,9 @@
                 } else {
                     mappagemap = new mapWidget('mapdiv', mappageOnBboxChange, mappageOnNodeUpdate);
                     if (!bbox) {
-                        mappagemap.map.zoomToMaxExtent();
-                        getPosition();
+                        //mappagemap.map.zoomToMaxExtent();
+                        //getPosition();
+                        mappagemap.map.fitWorld().locate({setView: true, maxZoom: 15});
                     }
                 }
 
@@ -400,7 +435,9 @@
                     bbox.top -= eps*h;
                     */
                     // might zoom out a bit without nasty hack ;)
-                    mappagemap.map.zoomToExtent(bbox.transform( epsg4326, mappagemap.map.getProjectionObject() ), true);
+                    //mappagemap.map.zoomToExtent(bbox.transform( epsg4326, mappagemap.map.getProjectionObject() ), true);
+//                    bounds = bbox.transform( epsg4326, mappagemap.map.getProjectionObject() )
+                    mappagemap.map.fitBounds(bbox);
                 }
             });
 
