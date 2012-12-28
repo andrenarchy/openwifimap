@@ -294,7 +294,7 @@
                         return;
                     }
                     
-                    var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]]).addTo(this.map).bindPopup(ich.mappopupmust(row, true), { maxWidth: 500}).openPopup()
+                    var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]]).addTo(this.map).bindPopup(ich.mappopupmust(row, true))
                     $("#mappopup").trigger('create');
                     this.nodes[row.id] = row;
                     /*this.nodes[row.id].marker = [];
