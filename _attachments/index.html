@@ -216,6 +216,7 @@
 
                 this.map.widget = this;
                 this.nodes = {};
+                this.neighbors = {};
 
                 /*
                 // resize markers on zoom
@@ -263,6 +264,11 @@
                             color: "#009900", 
                             opacity: 0.8
                         }).setRadius(15).addTo(this.markers).bindPopup(ich.mappopupmust(row, true));
+                    if (row.neighbors) {
+                        for (var i=0; i<row.neighbors.length; i++) {
+                            console.log(row.neighbors[i])
+                        }
+                    }
                 }
 
                 this.handleNodeupdate = function() {

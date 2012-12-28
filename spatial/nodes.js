@@ -11,13 +11,26 @@ function(doc) {
                 }
             }
         }
+        var neighbors = [];
+        if (doc.neighbors) {
+            for (var i=0; i<doc.neighbors.length; i++) {
+                if (doc.neighbors[i].id) {
+                    var neigh = { id: doc.neighbors[i].id };
+                    if (doc.neighbors[i].quality) {
+                       neigh["quality"] = doc.neighbors[i].quality;
+                    }
+                    neighbors.push(neigh);
+                }
+            }
+        }
         emit(
                 { type: "Point", coordinates: [doc.longitude, doc.latitude] }, 
                 {
                     id: doc._id,
                     hostname: doc.hostname,
                     tags: doc.tags,
-                    antennas: antennas
+                    antennas: antennas,
+                    neighbors: neighbors
                 }
             );
     }
