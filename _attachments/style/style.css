@@ -41,25 +41,8 @@ table.fifty td { vertical-align:top; padding:6px; width: 50%; }
 .titlecont h2 {
     display: inline-block;
 }
-/*
-.antenna_marker {
-    height: 15px !important;
-    width: 15px !important;
-    padding-left: 15px !important;
-    padding-top: 15px !important;
-    text-align: center;
-    overflow: visible;
-    border-radius: 15px;
-    background: rgba(0,255,0,0.5);
-    box-shadow: 0 0 0 2px rgba(0,255,0,0.8);
-}
 
-.antenna_marker:hover{
-    background: rgba(0,255,0,0.8);
-    box-shadow: 0 0 0 2px rgba(0,255,0,1);
-}
-*/
-.antenna_marker * {
+.antenna_marker {
     pointer-events: none;
 }
 

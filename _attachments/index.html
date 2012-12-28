@@ -175,58 +175,12 @@
 
             //////////////////////////////////////////////////////////
             // map widget
-
-            function getAntennaSVG(h, w, antenna) {
-                var data = {
-                    antenna: antenna,
-                    h: h,
-                    w: w,
-                    hh: h/2,
-                    hw: w/2,
-                    r: h*0.45,
-                    paths: ((antenna && antenna.direction && antenna.beamH) ?
-                        function() {
-                            var ant = this.antenna,
-                                cx = this.hw,
-                                cy = this.hh,
-                                r = this.r,
-                                start = (ant.direction - ant.beamH/2)*2*Math.PI/360,
-                                aperture = ant.beamH*2*Math.PI/360,
-                                startxy = [ Math.cos(start)*r, Math.sin(start)*r ],
-                                endxy = [ Math.cos(start+aperture)*r - startxy[0], Math.sin(start+aperture)*r - startxy[1] ],
-                                ret = '';
-                            ret += '<path d="M' + cx + ',' + cy + ' l' + startxy[0] + ' ' + startxy[1] + ' a' + r + ',' + r + ' ' + start + ' ' + ((aperture<Math.PI)? '0' : '1') +',1 ' + endxy[0] + ',' + endxy[1] + ' z' + '" fill="url(#gradfill)" pointer-events="fill" onmouseover="console.log(\'foooo\')" />';
-                            ret += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+startxy[0])+'" y2="'+(cy+startxy[1])+'" stroke="url(#gradline)" stroke-width="2" />';
-                            ret += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+endxy[0]+startxy[0])+'" y2="'+(cy+endxy[1]+startxy[1])+'" stroke="url(#gradline)" stroke-width="2" />';
-                            ret += '<circle cx="'+cx+'" cy="'+cy+'" r="'+0.1*r+'" />';
-                            return ret;
-                        }
-                        :
-                        function () {
-                            var ant = this.antenna,
-                                cx = this.hw,
-                                cy = this.hh,
-                                r = this.r,
-                                ret = '';
-                            ret += '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="url(#gradfill)" />';
-                            ret += '<circle cx="'+cx+'" cy="'+cy+'" r="'+0.1*r+'" />';
-                            return ret;
-                        })
-                }
-                svg = ich.mapiconsvg(data, true);
-                return svg;
-            }
-
-            function removePopups() {
-                this.popups.forEach( (function(popup) {
-                    this.removePopup(popup);
-                }).bind(this) );
-            };
-
+            /*
             function getIconSize(zoom) {
                 var len = Math.max(40, 175*Math.pow(0.8,18-zoom));
                 return size = new OpenLayers.Size(len, len);
             }
+            */
 
             function mapWidget(divId, onBboxChange, onNodeUpdate) {
                 //this.map = new OpenLayers.Map(divId);
@@ -242,9 +196,7 @@
 
                 function onLocationFound(e) {
                     var radius = e.accuracy / 2;
-//                    L.marker(e.latlng).addTo(this.map).
-//                    bindPopup("You are within " + radius + " meters from this point").openPopup();
-                    L.circle(e.latlng, radius).addTo(this.map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+                    L.circle(e.latlng, radius).addTo(this.map).bindPopup("You seem to be within " + radius + " meters from this point").openPopup();
                 }
 
                 function onLocationError(e) {
@@ -264,23 +216,8 @@
 
                 this.map.widget = this;
                 this.nodes = {};
+
                 /*
-                this.map.addLayer(new OpenLayers.Layer.OSM());
-                this.markers = new OpenLayers.Layer.Markers( "Markers" );
-                this.map.addLayer(this.markers);
-                this.popupid = null;
-
-                // create icon
-                var size = getIconSize(this.map.getZoom());
-                var offset = new OpenLayers.Pixel(-(size.w/2), -(size.h/2));
-                //icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-                this.icon = new OpenLayers.Icon('images/icon_wifi.png', size, null, function(s) {
-                    return new OpenLayers.Pixel( -s.w/2, -s.h/2 );
-                });
-
-                // remove popups on click on map
-                this.map.events.register("click", this.map, removePopups);
-
                 // resize markers on zoom
                 this.map.events.register("zoomend", this, function() {
                     var size = getIconSize(this.map.getZoom());
@@ -297,36 +234,35 @@
                         return;
                     }
 
-                    /*
-                    var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]], 
-                    {
-                        icon: new L.DivIcon({
-                            html: '<canvas id="icon_'+row.id+'" width="200" height="200"></canvas>',
-                            iconAnchor: new L.Point(100,100)
-                        })
-                    }).addTo(this.map).bindPopup(ich.mappopupmust(row, true))
-
-                    wifiIcon(document.getElementById("icon_"+row.id), 100, 100, 100, 0.4*2*Math.PI,0.2*2*Math.PI)
-                    */
                     this.nodes[row.id] = row;
-                    this.nodes[row.id].marker = [];
+                    this.nodes[row.id].antenna_markers = [];
                     if (!row.antennas || row.antennas.length==0) {
                         row.antennas = [{}];
                     }
                     latlng = [row.geometry.coordinates[1],row.geometry.coordinates[0]];
                     for (var i=0; i<row.antennas.length; i++) {
-                        svg = getAntennaSVG(100, 100, row.antennas[i]);
+                        svg = getAntennaIconSVG(100, 100, row.antennas[i]);
 
-                        var antenna = L.marker(latlng, 
-                        {
-                            icon: new L.DivIcon({
-                                html: svg,
-                                iconAnchor: new L.Point(50,50),
-                                className: "antenna_marker"
-                            })
-                            }).addTo(this.antennas);
+                        this.nodes[row.id].antenna_markers.push( L.marker(latlng, 
+                            { 
+                                icon: new L.DivIcon(
+                                {
+                                    html: svg,
+                                    iconAnchor: new L.Point(50,50),
+                                    className: "antenna_marker"
+                                })
+                            }).addTo(this.antennas)
+                        );
+
                     }
-                    L.circleMarker(latlng, {fillColor: "#00FF00", fillOpacity: 0.5, weight: 3, color: "#009900", opacity: 0.8}).setRadius(15).addTo(this.markers).bindPopup(ich.mappopupmust(row, true))
+                    this.nodes[row.id].marker = L.circleMarker(latlng, 
+                        {
+                            fillColor: "#00FF00", 
+                            fillOpacity: 0.5, 
+                            weight: 3, 
+                            color: "#009900", 
+                            opacity: 0.8
+                        }).setRadius(15).addTo(this.markers).bindPopup(ich.mappopupmust(row, true));
                 }
 
                 this.handleNodeupdate = function() {
