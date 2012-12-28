@@ -33,6 +33,7 @@
         
         <script src="external/leaflet/leaflet-src.js"></script>
         <script src="external/icanhaz/ICanHaz.js"></script>
+        <script src="script/icons.js"></script>
         <script>
             //////////////////////////////////////////////////////////
             // jquery mobile page + parameter handling
@@ -175,8 +176,7 @@
             //////////////////////////////////////////////////////////
             // map widget
 
-            var epsg4326 = new OpenLayers.Projection("EPSG:4326");
-
+            /*
             function getAntennaSVG(h, w, antenna) {
                 var data = {
                     antenna: antenna,
@@ -217,6 +217,7 @@
                 svg = ich.mapiconsvg(data, true);
                 return svg;
             }
+            */
 
             function removePopups() {
                 this.popups.forEach( (function(popup) {
@@ -240,8 +241,9 @@
 
                 function onLocationFound(e) {
                     var radius = e.accuracy / 2;
-                    L.marker(e.latlng).addTo(this.map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-                    L.circle(e.latlng, radius).addTo(this.map);
+//                    L.marker(e.latlng).addTo(this.map).
+//                    bindPopup("You are within " + radius + " meters from this point").openPopup();
+                    L.circle(e.latlng, radius).addTo(this.map).bindPopup("You are within " + radius + " meters from this point").openPopup();
                 }
 
                 function onLocationError(e) {
@@ -294,8 +296,16 @@
                         return;
                     }
                     
-                    var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]]).addTo(this.map).bindPopup(ich.mappopupmust(row, true))
-                    $("#mappopup").trigger('create');
+                    var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]], 
+                    {
+                        icon: new L.DivIcon({
+                            html: '<canvas id="icon_'+row.id+'" width="200" height="200"></canvas>',
+                            iconAnchor: new L.Point(100,100)
+                        })
+                    }).addTo(this.map).bindPopup(ich.mappopupmust(row, true))
+
+                    wifiIcon(document.getElementById("icon_"+row.id), 100, 100, 100, 0.4*2*Math.PI,0.2*2*Math.PI)
+
                     this.nodes[row.id] = row;
                     /*this.nodes[row.id].marker = [];
                     if (!row.antennas || row.antennas.length==0) {
