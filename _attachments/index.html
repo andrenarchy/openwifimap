@@ -231,7 +231,7 @@
 
             function mapWidget(divId, onBboxChange, onNodeUpdate) {
                 //this.map = new OpenLayers.Map(divId);
-                this.map = L.map(divId);
+                this.map = L.map(divId).fitWorld();
                 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
                     key: 'e4e152a60cc5414eb81532de3d676261',
                     styleId: 997,
@@ -240,7 +240,6 @@
 
                 function onLocationFound(e) {
                     var radius = e.accuracy / 2;
-                    console.log(e.latlng);
                     L.marker(e.latlng).addTo(this.map).bindPopup("You are within " + radius + " meters from this point").openPopup();
                     L.circle(e.latlng, radius).addTo(this.map);
                 }
@@ -249,15 +248,23 @@
                     console.log(e.message);
                 }
 
+                function onMoveEnd(e) {
+                    bboxstr = this.map.getBounds().toBBoxString();
+                    onBboxChange(bboxstr);
+                    getNodesBBOX(bboxstr, this.handleNodeupdate.bind(this));
+                }
+
                 this.map.on('locationfound', onLocationFound.bind(this));
                 this.map.on('locationerror', onLocationError.bind(this));
+                this.map.on('moveend', onMoveEnd.bind(this));
                 
 
                 this.map.widget = this;
-                /*this.map.addLayer(new OpenLayers.Layer.OSM());
+                this.nodes = {};
+                /*
+                this.map.addLayer(new OpenLayers.Layer.OSM());
                 this.markers = new OpenLayers.Layer.Markers( "Markers" );
                 this.map.addLayer(this.markers);
-                this.nodes = {};
                 this.popupid = null;
 
                 // create icon
@@ -279,16 +286,18 @@
                     }
 
                 });
+                */
 
                 this.processNode = function(row) {
                     // skip if node already present
                     if (this.nodes[row.id]) {
                         return;
                     }
-
-                    lonlat = new OpenLayers.LonLat.fromArray(row.geometry.coordinates).transform(epsg4326, this.map.getProjectionObject());
+                    
+                    var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]]).addTo(this.map).bindPopup(ich.mappopupmust(row, true), { maxWidth: 500}).openPopup()
+                    $("#mappopup").trigger('create');
                     this.nodes[row.id] = row;
-                    this.nodes[row.id].marker = [];
+                    /*this.nodes[row.id].marker = [];
                     if (!row.antennas || row.antennas.length==0) {
                         row.antennas = [{}];
                     }
@@ -330,6 +339,7 @@
                         );
                         this.markers.addMarker( marker );
                     }
+                    */
                 }
 
                 this.handleNodeupdate = function() {
@@ -344,8 +354,7 @@
                 };
 
                 // move handler
-                this.map.events.register('moveend', this.map, this.handleMoveend);
-                */
+                //this.map.events.register('moveend', this.map, this.handleMoveend);
             }
 
 
@@ -356,10 +365,6 @@
 
             function getBBOXfromString(str) {
                 arr = str.split(',')
-                /*OpenLayers.Bounds.fromString(str);
-                arr = bbox.toArray();
-                var valid = false;
-                */
                 if ( arr.length >= 4 ) {
                     valid = true;
                     for ( i = 0; i < 4; i++ ) {
@@ -368,7 +373,6 @@
                     }
                 }
                 arr = [[arr[1],arr[0]],[arr[3],arr[2]]];
-                console.log(arr);
                 return valid ? arr : null;
             }
 
@@ -382,28 +386,6 @@
                 $("a#listlink .ui-btn-text").text("List (" + currentnodes.nodes.length + ")" );
             }
 
-            function showPosition(pos) {
-                position = pos;
-                var lonlat = new OpenLayers.LonLat(pos.coords.longitude, pos.coords.latitude)
-                  .transform( new OpenLayers.Projection("EPSG:4326"), mappagemap.map.getProjectionObject() );
-                mappagemap.map.setCenter(lonlat, 13);
-            }
-
-            function showPositionHigh(pos) {
-                showPosition(pos);
-            }
-
-            function showPositionLow(pos) {
-                showPosition(pos);
-                navigator.geolocation.getCurrentPosition(showPositionHigh, null, {timeout: 10000, maximumAge:1000, enableHighAccuracy: true});
-            }
-
-            function getPosition() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPositionLow, null, {timeout: 5000, enableHighAccuracy: false});
-                }
-            }
-
             $('#map').live('pageshow', function() {
                 fixContentHeight();
 
@@ -412,14 +394,10 @@
                     bbox = getBBOXfromString($.mobile.activePageData.bbox);
                 }
 
-                if (mappagemap) {
-                    mappagemap.map.updateSize();
-                } else {
+                if (!mappagemap) {
                     mappagemap = new mapWidget('mapdiv', mappageOnBboxChange, mappageOnNodeUpdate);
                     if (!bbox) {
-                        //mappagemap.map.zoomToMaxExtent();
-                        //getPosition();
-                        mappagemap.map.fitWorld().locate({setView: true, maxZoom: 15});
+                        mappagemap.map.locate({setView: true, maxZoom: 15});
                     }
                 }
 
@@ -435,8 +413,6 @@
                     bbox.top -= eps*h;
                     */
                     // might zoom out a bit without nasty hack ;)
-                    //mappagemap.map.zoomToExtent(bbox.transform( epsg4326, mappagemap.map.getProjectionObject() ), true);
-//                    bounds = bbox.transform( epsg4326, mappagemap.map.getProjectionObject() )
                     mappagemap.map.fitBounds(bbox);
                 }
             });
@@ -472,9 +448,6 @@
             function detailmapResize() {
                 map = $("#detailmap");
                 map.height( map.actual('width')*0.5 );
-                if (detailpagemap) {
-                    detailpagemap.map.updateSize();
-                }
             }
 
             $(window).bind("pageshow resize", detailmapResize);
@@ -519,17 +492,15 @@
                                 $("#avaframe").empty().append( '<img id="avatar" src="' + avatarurl + '" />' );
                             }
 
+                            detailmapResize();
                             if (!detailpagemap) {
                                 detailpagemap = new mapWidget('detailmap', function(){}, function(){});
                             } else {
                                 $("#detailmapcontainer").empty().append(mapdiv);
                             }
-                            detailmapResize();
-                            var lonlat = new OpenLayers.LonLat(data.longitude, data.latitude)
-                                .transform( new OpenLayers.Projection("EPSG:4326"), detailpagemap.map.getProjectionObject() );
-                            detailpagemap.map.setCenter(lonlat, 16);
+                            detailpagemap.map.setView([data.latitude,data.longitude], 16);
                             $("#detailmapcenter").click( function () {
-                                detailpagemap.map.setCenter(lonlat, 16);
+                                detailpagemap.map.setView([data.latitude,data.longitude], 16);
                             });
                         });
                 } else {
