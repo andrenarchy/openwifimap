@@ -176,7 +176,6 @@
             //////////////////////////////////////////////////////////
             // map widget
 
-            /*
             function getAntennaSVG(h, w, antenna) {
                 var data = {
                     antenna: antenna,
@@ -196,7 +195,7 @@
                                 startxy = [ Math.cos(start)*r, Math.sin(start)*r ],
                                 endxy = [ Math.cos(start+aperture)*r - startxy[0], Math.sin(start+aperture)*r - startxy[1] ],
                                 ret = '';
-                            ret += '<path d="M' + cx + ',' + cy + ' l' + startxy[0] + ' ' + startxy[1] + ' a' + r + ',' + r + ' ' + start + ' ' + ((aperture<Math.PI)? '0' : '1') +',1 ' + endxy[0] + ',' + endxy[1] + ' z' + '" fill="url(#gradfill)" />';
+                            ret += '<path d="M' + cx + ',' + cy + ' l' + startxy[0] + ' ' + startxy[1] + ' a' + r + ',' + r + ' ' + start + ' ' + ((aperture<Math.PI)? '0' : '1') +',1 ' + endxy[0] + ',' + endxy[1] + ' z' + '" fill="url(#gradfill)" pointer-events="fill" onmouseover="console.log(\'foooo\')" />';
                             ret += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+startxy[0])+'" y2="'+(cy+startxy[1])+'" stroke="url(#gradline)" stroke-width="2" />';
                             ret += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+endxy[0]+startxy[0])+'" y2="'+(cy+endxy[1]+startxy[1])+'" stroke="url(#gradline)" stroke-width="2" />';
                             ret += '<circle cx="'+cx+'" cy="'+cy+'" r="'+0.1*r+'" />';
@@ -217,7 +216,6 @@
                 svg = ich.mapiconsvg(data, true);
                 return svg;
             }
-            */
 
             function removePopups() {
                 this.popups.forEach( (function(popup) {
@@ -238,6 +236,9 @@
                     styleId: 997,
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>'
                 }).addTo(this.map);
+
+                this.antennas = L.layerGroup().addTo(this.map);
+                this.markers = L.layerGroup().addTo(this.map);
 
                 function onLocationFound(e) {
                     var radius = e.accuracy / 2;
@@ -295,7 +296,8 @@
                     if (this.nodes[row.id]) {
                         return;
                     }
-                    
+
+                    /*
                     var marker = L.marker([row.geometry.coordinates[1],row.geometry.coordinates[0]], 
                     {
                         icon: new L.DivIcon({
@@ -305,51 +307,26 @@
                     }).addTo(this.map).bindPopup(ich.mappopupmust(row, true))
 
                     wifiIcon(document.getElementById("icon_"+row.id), 100, 100, 100, 0.4*2*Math.PI,0.2*2*Math.PI)
-
+                    */
                     this.nodes[row.id] = row;
-                    /*this.nodes[row.id].marker = [];
+                    this.nodes[row.id].marker = [];
                     if (!row.antennas || row.antennas.length==0) {
                         row.antennas = [{}];
                     }
+                    latlng = [row.geometry.coordinates[1],row.geometry.coordinates[0]];
                     for (var i=0; i<row.antennas.length; i++) {
-                        var icon = this.icon.clone();
-                        icon.antenna = row.antennas[i];
-                        icon.size = getIconSize(this.map.getZoom());
-                        icon.draw = function(px) {
-                            svg = getAntennaSVG(this.size.w, this.size.h, this.antenna);
-                            $(this.imageDiv).empty().append(svg);
-                            this.moveTo(px);
-                            return this.imageDiv;
-                        };
-                        marker = new OpenLayers.Marker(lonlat, icon);
-                        marker.events.register("click", {
-                            widget: this,
-                            lonlat: lonlat,
-                            row: row
-                            },
-                            function () {
-                                if (this.widget.popupid == this.row["id"]) {
-                                    removePopups.bind(this.widget.map)();
-                                    this.widget.popupid = null;
-                                } else {
-                                    popup = new OpenLayers.Popup.FramedCloud(
-                                        "popup",
-                                        this.lonlat,
-                                        null,
-                                        ich.mappopupmust(this.row, true),
-                                        null,
-                                        false,
-                                        null);
-                                    this.widget.map.addPopup(popup, true);
-                                    $("#mappopup").trigger('create');
-                                    popup.updateSize();
-                                    this.widget.popupid = this.row["id"];
-                                }
-                            }
-                        );
-                        this.markers.addMarker( marker );
+                        svg = getAntennaSVG(100, 100, row.antennas[i]);
+
+                        var antenna = L.marker(latlng, 
+                        {
+                            icon: new L.DivIcon({
+                                html: svg,
+                                iconAnchor: new L.Point(50,50),
+                                className: "antenna_marker"
+                            })
+                            }).addTo(this.antennas);
                     }
-                    */
+                    L.circleMarker(latlng, {fillColor: "#00FF00", fillOpacity: 0.5, weight: 3, color: "#009900", opacity: 0.8}).setRadius(15).addTo(this.markers).bindPopup(ich.mappopupmust(row, true))
                 }
 
                 this.handleNodeupdate = function() {
@@ -430,13 +407,13 @@
             //////////////////////////////////////////////////////////
             // list page
             $('#list').live('pagebeforeshow', function (){
-                bbox = null;
+                bboxstr = null;
                 if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
-                    bbox = getBBOXfromString($.mobile.activePageData.bbox);
+                    bboxstr = $.mobile.activePageData.bbox;
                 }
-                if (bbox) {
-                    $("a#maplink").attr("href", "#map?bbox=" + bbox.toString());
-                    getNodesBBOX(bbox.toBBOX(), function () {
+                if (bboxstr) {
+                    $("a#maplink").attr("href", "#map?bbox=" + bboxstr);
+                    getNodesBBOX(bboxstr, function () {
                         $("#listdiv").empty().append( ich.listmust(currentnodes) );
                         var listul = $("#listul");
                         if (listul.hasClass('ui-listview')) {
