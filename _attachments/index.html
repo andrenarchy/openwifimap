@@ -264,15 +264,28 @@
                             color: "#009900", 
                             opacity: 0.8
                         }).setRadius(15).addTo(this.markers).bindPopup(ich.mappopupmust(row, true));
-                    if (row.neighbors) {
-                        for (var i=0; i<row.neighbors.length; i++) {
-                            console.log(row.neighbors[i])
+                }
+
+                this.updateNeighbors = function(currentnodes) {
+                    nodeids = Object.keys(this.nodes)
+                    for (var i=0; i<nodeids.length; i++) {
+                        row = this.nodes[nodeids[i]];
+                        if (row.neighbors) {
+                            for (var i=0; i<row.neighbors.length; i++) {
+                                var neigh = row.neighbors[i];
+                                if (this.nodes[neigh.id]) {
+                                    console.log(row.neighbors[i])
+                                    latlng=[[row.geometry.coordinates[1],row.geometry.coordinates[0]],[this.nodes[neigh.id].geometry.coordinates[1],this.nodes[neigh.id].geometry.coordinates[0]]];
+                                    L.polyline(latlng).addTo(this.map)
+                                }
+                            }
                         }
                     }
                 }
 
                 this.handleNodeupdate = function() {
                     currentnodes.nodes.forEach( this.processNode.bind(this) );
+                    this.updateNeighbors(currentnodes.nodes);
                     onNodeUpdate();
                 };
 
