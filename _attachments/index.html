@@ -160,10 +160,7 @@
                                 currentnodes.nodes = [];
                                 data.rows.forEach( function(row) {
                                     if (row.id && row.geometry && row.geometry.coordinates && row.value) {
-                                        newnode = row.value;
-                                        delete row.value;
-                                        $.extend( newnode, row );
-                                        currentnodes.nodes.push(newnode);
+                                        currentnodes.nodes.push(row);
                                     }
                                 });
                                 success();
@@ -215,8 +212,28 @@
                 
 
                 this.map.widget = this;
-                this.nodes = {};
-                this.neighbors = {};
+                /*
+                nodes[id] = { 
+                    data: data from _spatial/nodes view,
+                    antenna_markers: L.marker [],
+                    marker: L.circleMarker (clickable circle),
+                    neighbors:  
+                        {
+                            id1: L.polyline1,
+                            id2, L.polyline2
+                        }, 
+                    neighbors_handled: true|false (have we tried to 
+                        connect/retrieve all neighbors of this node?)
+                }
+                */
+                this.nodes = {}; 
+
+                /*
+                neighbors_pending[id] is an object where the keys are node ids
+                that already are present in this.nodes and are waiting for its
+                neighbor with id 'id'
+                */
+                this.neighbors_pending = {};
 
                 /*
                 // resize markers on zoom
@@ -229,22 +246,15 @@
                 });
                 */
 
-                this.processNode = function(row) {
-                    // skip if node already present
-                    if (this.nodes[row.id]) {
-                        return;
+                function addAntennaMarkers(antennas, latlnt, layer) {
+                    var antenna_markers = [];
+                    if (!antennas || antennas.length==0) {
+                        antennas = [{}];
                     }
+                    for (var i=0; i<antennas.length; i++) {
+                        svg = getAntennaIconSVG(100, 100, antennas[i]);
 
-                    this.nodes[row.id] = row;
-                    this.nodes[row.id].antenna_markers = [];
-                    if (!row.antennas || row.antennas.length==0) {
-                        row.antennas = [{}];
-                    }
-                    latlng = [row.geometry.coordinates[1],row.geometry.coordinates[0]];
-                    for (var i=0; i<row.antennas.length; i++) {
-                        svg = getAntennaIconSVG(100, 100, row.antennas[i]);
-
-                        this.nodes[row.id].antenna_markers.push( L.marker(latlng, 
+                        antenna_markers.push( L.marker(latlng, 
                             { 
                                 icon: new L.DivIcon(
                                 {
@@ -252,40 +262,126 @@
                                     iconAnchor: new L.Point(50,50),
                                     className: "antenna_marker"
                                 })
-                            }).addTo(this.antennas)
+                            }).addTo(layer)
                         );
-
                     }
-                    this.nodes[row.id].marker = L.circleMarker(latlng, 
+                    return antenna_markers;
+                }
+
+                function addMarker(nodevalue, latlng, layer) {
+                    return L.circleMarker(latlng, 
                         {
                             fillColor: "#00FF00", 
                             fillOpacity: 0.5, 
                             weight: 3, 
                             color: "#009900", 
                             opacity: 0.8
-                        }).setRadius(15).addTo(this.markers).bindPopup(ich.mappopupmust(row, true));
+                        }).setRadius(15).addTo(layer).bindPopup(ich.mappopupmust(nodevalue, true));
+                }
+
+                this.addNeighbor(id1, id2, layer) {
+                    var node1 = this.nodes[id1]
+                    var node2 = this.nodes[id2]
+
+                    if (node1.neighbors[id2] && node2.neighbors[id1]) {
+                        return
+                    }
+
+                    var coords1 = node1.data.geometry.coordinates;
+                    var coords2 = node2.data.geometry.coordinates;
+                    var latlng = [[coords1[1],coords1[0]],[coords2[1],coords2[0]]];
+                    var line = L.polyline(latlng).addTo(layer)
+                    node1.neighbors[id2] = line;
+                    node2.neighbors[id1] = line;
+                }
+
+                this.processNodes = function(currentnodes) {
+                    var missing_neighbors = {}
+                    for (var i=0; i<currentnodes.nodes.length; i++) {
+                        node = currentnodes.nodes[i];
+
+                        // node comes in fresh
+                        if (!this.nodes[node.id]) {
+                            var latlng = [coordinates[1],node.value.geometry.coordinates[0]];
+
+                            this.nodes[node.id] = {
+                                data: node,
+                                antenna_markers: addAntennaMarkers(node.value.antennas, latlng, this.antennas),
+                                marker: addMarker(node.value, latlng, this.markers),
+                                neighbors: [],
+                                neighbors_handled: false
+                            }
+                        }
+
+                        // node is new in the bbox, so add/pull all neighbors
+                        if (this.nodes[node.id] && !this.nodes[node.id].neighbors_handled) {
+                            // add neighbors
+                            neighbors = node.value.neighbors;
+                            if (neighbors) {
+                                for (var i=0; i<neighbors.length; i++) {
+                                    var neighbor = neighbors[i];
+                                    console.log(neighbor)
+                                    // neighbor present in this.nodes?
+                                    if (this.nodes[neighbor.id]) {
+                                        this.addNeighbor(node.id, neighbor.id);
+                                    // neighbor not present in this.nodes
+                                    } else {
+                                        if (!this.neighbors_pending[neighbor.id]) {
+                                            this.neighbors_pending[neighbor.id] = {};
+                                        }
+                                        this.neighbors_pending[neighbor.id][node.id] = true;
+                                        missing_neighbors[neighbor.id] = true;
+                                    }
+                                }
+                            }
+
+                            
+                            this.nodes[node.id].neighbors_handled = true;
+                        }
+
+                        // do we wait for this node? add neighbors if not yet done
+                        if (this.neighbors_pending[node]) {
+                            for (neighid in this.neighbors_pending[node]) {
+                                this.addNeighbor(node.id, neighid);
+                            }
+                            delete this.neighbors_pending[node]
+                        }
+                    }
+
+                    // pull missing neighbors
+                    missing_neighbors = Object.keys(missing_neighbors);
+                    if (len(missing_neighbors)>0) {
+                        console.log('get missing_neighbors');
+                        console.log(missing_neighbors);
+                        //getNodesIds(missing_neighbors);
+                    }
+                    /*
+                    // skip if node already present
+                    if (this.nodes[row.id]) {
+                        return;
+                    }
+
+                    this.nodes[row.id] = row;
+                        */
                 }
 
                 this.updateNeighbors = function(currentnodes) {
-                    nodeids = Object.keys(this.nodes)
+                    for (var key in this.nodes) {
+                        console.log(key)
+                    }
+                    /*
                     for (var i=0; i<nodeids.length; i++) {
                         row = this.nodes[nodeids[i]];
                         if (row.neighbors) {
-                            for (var i=0; i<row.neighbors.length; i++) {
-                                var neigh = row.neighbors[i];
-                                if (this.nodes[neigh.id]) {
-                                    console.log(row.neighbors[i])
-                                    latlng=[[row.geometry.coordinates[1],row.geometry.coordinates[0]],[this.nodes[neigh.id].geometry.coordinates[1],this.nodes[neigh.id].geometry.coordinates[0]]];
-                                    L.polyline(latlng).addTo(this.map)
-                                }
-                            }
                         }
                     }
+                    */
                 }
 
                 this.handleNodeupdate = function() {
-                    currentnodes.nodes.forEach( this.processNode.bind(this) );
-                    this.updateNeighbors(currentnodes.nodes);
+                    this.processNodes( currentnodes )
+                    //currentnodes.nodes.forEach( this.processNode.bind(this) );
+                    //this.updateNeighbors(currentnodes.nodes);
                     onNodeUpdate();
                 };
 
