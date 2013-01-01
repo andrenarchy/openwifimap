@@ -23,8 +23,7 @@ function(doc) {
                 }
             }
         }
-        emit(
-                { type: "Point", coordinates: [doc.longitude, doc.latitude] }, 
+        emit( doc._id,
                 {
                     id: doc._id,
                     hostname: doc.hostname,
