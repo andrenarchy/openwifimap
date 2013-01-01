@@ -41,8 +41,3 @@ table.fifty td { vertical-align:top; padding:6px; width: 50%; }
 .titlecont h2 {
     display: inline-block;
 }
-
-.antenna_marker {
-    pointer-events: none;
-}
-

@@ -86,8 +86,6 @@ mapwidget.prototype.onMoveEnd = function(e) {
     //getNodesBBOX(bboxstr, this.handleNodeupdate.bind(this));
     $.getJSON('_spatial/nodes', { "bbox": bboxstr }, (function(data) {
             var missing_neighbors = {};
-            console.log('nodes received!');
-            console.log(data);
             for (var row_idx=0; row_idx<data.rows.length; row_idx++) {
                 nodedata = data.rows[row_idx].value;
                 this.addNode(nodedata);
@@ -117,13 +115,8 @@ mapwidget.prototype.onMoveEnd = function(e) {
                     this.nodes[nodedata.id].neighbors_handled = true;
                 }
             }
-            console.log(this.neighbors_pending);
             missing_neighbors = Object.keys(missing_neighbors);
             if (missing_neighbors.length>0) {
-                console.log('missing nodes:');
-                console.log(missing_neighbors);
-                console.log(JSON.stringify({ "keys": missing_neighbors }))
-
                 // does not work with $.post(). Why? Dunno.
                 $.ajax({
                     type: 'POST',
@@ -132,8 +125,6 @@ mapwidget.prototype.onMoveEnd = function(e) {
                     data: JSON.stringify({"keys": missing_neighbors }),
                     url: '_view/nodes_essentials',
                     success: (function(data){
-                        console.log('success!');
-                        console.log(data);
                         for (var row_idx=0; row_idx<data.rows.length; row_idx++) {
                             nodedata = data.rows[row_idx].value;
                             this.addNode(nodedata);
@@ -231,7 +222,6 @@ mapwidget.prototype.addNeighbor = function(id1, id2) {
     var node2 = this.nodes[id2]
 
     if (node1.neighbor_lines[id2] && node2.neighbor_lines[id1]) {
-        console.log('neighbors '+id1+' and '+id2+' are already registered!')
         return
     }
 
