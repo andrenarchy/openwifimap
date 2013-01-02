@@ -4,20 +4,29 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     this.onBBOXChange = onBBOXChange;
     this.onNodeUpdate = onNodeUpdate;
     this.map = L.map(divId).fitWorld();
-    L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
+
+    this.tile_cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
         key: 'e4e152a60cc5414eb81532de3d676261',
         styleId: 997,
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>'
     }).addTo(this.map);
+    // https://raw.github.com/shramov/leaflet-plugins/master/layer/tile/Bing.js
+    this.tile_bing = new L.BingLayer("ArewtcSllazYp52r7tojb64N94l-OrYWuS1GjUGeTavPmJP_jde3PIdpuYm24VpR");
 
-    this.antennalayer = L.layerGroup().addTo(this.map);
-    this.neighborlayer = L.layerGroup().addTo(this.map);
-    this.nodelayer = L.layerGroup().addTo(this.map);
-    L.control.layers(null, {
-        "Antennas": this.antennalayer,
-        "Neighbor links": this.neighborlayer,
-        "Nodes": this.nodelayer
-    }).addTo(this.map);
+    this.layer_antennas = L.layerGroup().addTo(this.map);
+    this.layer_neighborlinks = L.layerGroup().addTo(this.map);
+    this.layer_nodes = L.layerGroup().addTo(this.map);
+    L.control.layers(
+        {
+            "Cloudmade OSM": this.tile_cloudmade,
+            "Bing satellite": this.tile_bing
+        },
+        {
+            "Antennas": this.layer_antennas,
+            "Neighbor links": this.layer_neighborlinks,
+            "Nodes": this.layer_nodes
+        }
+    ).addTo(this.map);
 
     this.map.on('locationfound', this.onLocationFound.bind(this));
     this.map.on('locationerror', this.onLocationError.bind(this));
@@ -218,7 +227,7 @@ mapwidget.prototype.addAntennaMarkers = function(antennas, latlng) {
                     iconAnchor: new L.Point(50,50),
                     className: "antenna_marker"
                 })
-            }).addTo(this.antennalayer)
+            }).addTo(this.layer_antennas)
         );
     }
     return antenna_markers;
@@ -232,7 +241,7 @@ mapwidget.prototype.addNodeMarker = function(nodedata) {
             weight: 3, 
             color: "#009900", 
             opacity: 0.8
-        }).setRadius(15).addTo(this.nodelayer).bindPopup(this.getPopupHTML(nodedata));
+        }).setRadius(15).addTo(this.layer_nodes).bindPopup(this.getPopupHTML(nodedata));
 }
 
 mapwidget.prototype.addNeighbor = function(id1, id2) {
@@ -243,7 +252,7 @@ mapwidget.prototype.addNeighbor = function(id1, id2) {
         return
     }
 
-    var line = L.polyline([node1.data.latlng,node2.data.latlng], {clickable: false}).addTo(this.neighborlayer)
+    var line = L.polyline([node1.data.latlng,node2.data.latlng], {clickable: false}).addTo(this.layer_neighborlinks)
     node1.neighbor_lines[id2] = line;
     node2.neighbor_lines[id1] = line;
 }
