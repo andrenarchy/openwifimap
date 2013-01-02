@@ -5,10 +5,6 @@ html, body, #content, #map, #mapdiv, #detailmap {
     margin: 0;
 }
 
-.olControlAttribution {
-    bottom: 5px;
-}
-
 table { width:100%; }
 table.fifty td { vertical-align:top; padding:6px; width: 50%; } 
 
