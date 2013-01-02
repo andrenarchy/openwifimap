@@ -4,6 +4,10 @@
         "to": "index.html"
     },
     {
+        "from": "map.html",
+        "to": "map.html"
+    },
+    {
         "from": "images/*",
         "to": "images/*"
     },
