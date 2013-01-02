@@ -1,5 +1,8 @@
-function mapwidget(divId, getPopupHTML) {
+ich_template_added = false;
+function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     this.getPopupHTML = getPopupHTML;
+    this.onBBOXChange = onBBOXChange;
+    this.onNodeUpdate = onNodeUpdate;
     this.map = L.map(divId).fitWorld();
     L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
         key: 'e4e152a60cc5414eb81532de3d676261',
@@ -41,7 +44,9 @@ function mapwidget(divId, getPopupHTML) {
     neighbor with id 'id'. */
     this.neighbors_pending = {};
 
-    ich.addTemplate('nodemarker', '<svg width="{{w}}" height="{{h}}">\
+    if (!ich_template_added) {
+        ich_template_added = true;
+        ich.addTemplate('nodemarker', '<svg width="{{w}}" height="{{h}}">\
     <defs>\
         <radialGradient id="gradfill" gradientUnits="userSpaceOnUse" cx="{{hw}}" cy="{{hh}}" r="{{r}}" fx="{{hw}}" fy="{{hh}}">\
             <stop offset="0%" style="stop-color:rgb(0,0,255); stop-opacity:0" />\
@@ -69,6 +74,7 @@ function mapwidget(divId, getPopupHTML) {
     </defs>\
     {{{paths}}}\
 </svg>');
+    }
 }
 
 mapwidget.prototype.onLocationFound = function(e) {
@@ -81,13 +87,16 @@ mapwidget.prototype.onLocationError = function(e) {
 }
 
 mapwidget.prototype.onMoveEnd = function(e) {
-    bboxstr = this.map.getBounds().toBBoxString();
-    //onBboxChange(bboxstr);
-    //getNodesBBOX(bboxstr, this.handleNodeupdate.bind(this));
+    var bboxstr = this.map.getBounds().toBBoxString();
+    if (this.onBBOXChange) {
+        this.onBBOXChange(bboxstr);
+    }
     $.getJSON('_spatial/nodes', { "bbox": bboxstr }, (function(data) {
             var missing_neighbors = {};
+            var bbox_nodes = [];
             for (var row_idx=0; row_idx<data.rows.length; row_idx++) {
                 nodedata = data.rows[row_idx].value;
+                bbox_nodes.push(nodedata);
                 this.addNode(nodedata);
                 if (!this.nodes[nodedata.id].neighbors_handled) {
                     for (var neigh_idx=0; neigh_idx<nodedata.neighbors.length; neigh_idx++) {
@@ -115,6 +124,10 @@ mapwidget.prototype.onMoveEnd = function(e) {
                     this.nodes[nodedata.id].neighbors_handled = true;
                 }
             }
+            if (this.onNodeUpdate) {
+                this.onNodeUpdate(bboxstr, bbox_nodes);
+            }
+
             missing_neighbors = Object.keys(missing_neighbors);
             if (missing_neighbors.length>0) {
                 // does not work with $.post(). Why? Dunno.

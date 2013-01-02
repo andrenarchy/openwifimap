@@ -1,4 +1,4 @@
-html, body, #content, #map, #mapdiv {
+html, body, #content, #map, #mapdiv, #detailmap {
     width: 100%; 
     height: 100%;
     padding: 0;
@@ -7,11 +7,6 @@ html, body, #content, #map, #mapdiv {
 
 .olControlAttribution {
     bottom: 5px;
-}
-
-#detailmap {
-    width: 100%;
-    height: 200px;
 }
 
 table { width:100%; }
