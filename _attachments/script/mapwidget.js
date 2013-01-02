@@ -238,7 +238,7 @@ mapwidget.prototype.addNeighbor = function(id1, id2) {
         return
     }
 
-    var line = L.polyline([node1.data.latlng,node2.data.latlng]).addTo(this.neighborlayer)
+    var line = L.polyline([node1.data.latlng,node2.data.latlng], {clickable: false}).addTo(this.neighborlayer)
     node1.neighbor_lines[id2] = line;
     node2.neighbor_lines[id1] = line;
 }
