@@ -2,6 +2,6 @@
     pointer-events: none;
 }
 
-.ui-btn-text {
+.leaflet-popup-content span {
     color: white;
 }
