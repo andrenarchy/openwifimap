@@ -3,7 +3,7 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     this.getPopupHTML = getPopupHTML;
     this.onBBOXChange = onBBOXChange;
     this.onNodeUpdate = onNodeUpdate;
-    this.map = L.map(divId, {worldCopyJump: false}).fitWorld();
+    this.map = L.map(divId).fitWorld();
     L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
         key: 'e4e152a60cc5414eb81532de3d676261',
         styleId: 997,
