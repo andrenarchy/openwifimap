@@ -28,6 +28,8 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
         }
     ).addTo(this.map);
 
+    L.control.scale({imperial: false, maxWidth: 200}).addTo(this.map);
+
     this.map.on('locationfound', this.onLocationFound.bind(this));
     this.map.on('locationerror', this.onLocationError.bind(this));
     this.map.on('moveend', this.onMoveEnd.bind(this));
