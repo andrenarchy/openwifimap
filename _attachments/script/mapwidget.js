@@ -13,6 +13,11 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     this.antennalayer = L.layerGroup().addTo(this.map);
     this.neighborlayer = L.layerGroup().addTo(this.map);
     this.nodelayer = L.layerGroup().addTo(this.map);
+    L.control.layers(null, {
+        "Antennas": this.antennalayer,
+        "Neighbor links": this.neighborlayer,
+        "Nodes": this.nodelayer
+    }).addTo(this.map);
 
     this.map.on('locationfound', this.onLocationFound.bind(this));
     this.map.on('locationerror', this.onLocationError.bind(this));
