@@ -35,8 +35,18 @@ html, body, #map, #mapdiv, #detailmap {
     margin: 0;
 }
 
-table { width:100%; }
-table.fifty td { vertical-align:top; padding:6px; width: 50%; } 
+table {
+    width: 100%;
+    border-spacing: 0;
+}
+table.fifty td {
+    vertical-align: top;
+    padding: 6px;
+    width: 50%;
+}
+table.fifty tr:nth-child(even) {
+    background-color: #e0e0e0;
+}
 
 #avatar {
     vertical-align: middle;
