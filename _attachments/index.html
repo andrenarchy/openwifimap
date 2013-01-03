@@ -22,9 +22,7 @@
             });
         </script>
         <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.js"></script>
-        <script src="http://raw.github.com/dreamerslab/jquery.actual/master/jquery.actual.js"></script>
-        <!--script src="external/jqm/jquery.mobile-1.2.0.js"></script>
-        <script src="external/jqm/jquery.actual.js"></script-->
+        <!--script src="external/jqm/jquery.mobile-1.2.0.js"></script-->
 
         <script src="external/leaflet/leaflet-src.js"></script>
         <script src="external/leaflet/Bing.js"></script>
@@ -120,43 +118,11 @@
                 ignoreNextHashChange = false;
             });
 
-            // fix height of content
-            function fixContentHeight(e) {
-                var currentPageID = $.mobile.activePage == null ? defaultPage : $.mobile.activePage.attr('id'),
-                footer = $("div#" + currentPageID + " > div[data-role='footer']"),
-                header = $("div#" + currentPageID + " > div[data-role='header']"),
-                content = $("div#" + currentPageID + " > div[data-role='content']"),
-                viewHeight = $(window).height(),
-                newContentHeight = viewHeight - header.actual('outerHeight') - footer.actual('outerHeight');
-                newContentHeight -= (content.actual('outerHeight') - content.actual('height') /*+ 1*/ );
-                if (newContentHeight != content.actual('height')) {
-                    content.height(newContentHeight);
-                }
-            }
-
-            // fix the content height AFTER jQuery Mobile has rendered the map page
-            $(window).bind("orientationchange resize pagebeforeshow pageshow", fixContentHeight);
-
-
-            //TODO: remove!
-            $(document).live("pagebeforeshow", function (e, data) {
-                //console.log( $.mobile.activePageData );
-            });
-
             //////////////////////////////////////////////////////////
             // general functions
             function getPopupHTML(nodedata) {
                 return ich.mappopupmust(nodedata, true);
             }
-
-            //////////////////////////////////////////////////////////
-            // map widget
-            /*
-            function getIconSize(zoom) {
-                var len = Math.max(40, 175*Math.pow(0.8,18-zoom));
-                return size = new OpenLayers.Size(len, len);
-            }
-            */
 
             //////////////////////////////////////////////////////////
             // map page
@@ -177,9 +143,12 @@
             }
 
             function mappageOnBboxChange(bboxstr) {
-                ignoreNextHashChange = true;
-                window.location.hash = "#map?bbox=" + bboxstr;
-                $("a#listlink").attr("href", "#list?bbox=" + bboxstr);
+                var currentPageID = $.mobile.activePage == null ? defaultPage : $.mobile.activePage.attr('id');
+                if (currentPageID=="map") {
+                    ignoreNextHashChange = true;
+                    window.location.hash = "#map?bbox=" + bboxstr;
+                    $("a#listlink").attr("href", "#list?bbox=" + bboxstr);
+                }
             }
 
             nodecache = { bboxstr: null, nodes: [] };
@@ -190,8 +159,6 @@
             }
 
             $('#map').live('pageshow', function() {
-                fixContentHeight();
-
                 var bbox = null;
                 if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
                     bbox = getBBOXfromString($.mobile.activePageData.bbox);
@@ -215,6 +182,7 @@
                     bbox.bottom += eps*h;
                     bbox.top -= eps*h;
                     */
+
                     // might zoom out a bit without nasty hack ;)
                     mappagemap.map.fitBounds(bbox);
                 }
@@ -222,7 +190,7 @@
 
             function mappagemapResize() {
                 if (mappagemap) {
-                    //mappagemap.map.invalidateSize();
+                    mappagemap.map.invalidateSize();
                 }
             }
 
@@ -270,7 +238,7 @@
 
             function detailmapResize() {
                 var map = $("#detailmap");
-                map.height( map.actual('width')*0.5 );
+                map.height( map.width()*0.5 );
                 if (detailpagemap) {
                     detailpagemap.map.invalidateSize();
                 }
@@ -469,68 +437,78 @@
 
     <body>
         <div data-role="page" data-theme="b" id="map">
-             <div data-role="header" id="header">
-                <h1>OpenWiFiMap</h1>
-            </div>
-            <div data-role="content" id="content">
-                <div id="mapdiv"></div>
-            </div>
-            <div data-role="footer" id="footer">
-                <div class="ui-grid-b">
-                    <div class="ui-block-a">
-                        <a href="#about" data-role="button" data-rel="popup" data-position-to="window" data-transition="fade" data-mini="false">About</a>
-                        <div data-role="popup" id="about" data-theme="b" data-overlay-theme="a">
-                            <div data-role="header">
-                                <h1>About</h1>
-                            </div>
-                            <div data-role="content" style="max-width: 400px;">
-                                <p>OpenWiFiMap is
-                                <ul>
-                                    <li>free software licensed under the MIT License.</li>
-                                    <li>available at <a href="https://github.com/andrenarchy/openwifimap">github</a>. Please submit code, bug reports or ideas for improvements there!</li>
-                                    <li>meant to support free networks (free as in 'free speech', not 'free beer') like <a href="http://www.freifunk.net">freifunk</a>.</li>
-                                    <li>a <a href="http://couchapp.org/page/index">CouchApp</a> and you can thus easily run your own instance by pushing it to your CouchDB server.</li>
-                                    <li>inspired by the <a href="http://heartbeat.basicinside.de/">Freifunk heartbeat site</a>.</li>
-                                    <li>written by <a href="http://page.math.tu-berlin.de/~gaul">Andr&eacute; Gaul</a>.</li>
-                                </ul>
-                                The WiFi icon was created by <a href="http://commons.wikimedia.org/wiki/User:Canopus49">Canopus49</a> and is licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/deed.en">CC-BY-SA</a>.
-                                </p>
-                                <a data-role="button" onclick="$('#about').popup( 'close' )" data-theme="b">Close</a>
+            <div id="container">
+                <div data-role="header" id="header">
+                    <h1>OpenWiFiMap</h1>
+                </div>
+                <div data-role="content" id="content">
+                    <div id="mapdiv"></div>
+                </div>
+                <div data-role="footer" id="footer">
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a">
+                            <a href="#about" data-role="button" data-rel="popup" data-position-to="window" data-transition="fade" data-mini="false">About</a>
+                            <div data-role="popup" id="about" data-theme="b" data-overlay-theme="a">
+                                <div data-role="header">
+                                    <h1>About</h1>
+                                </div>
+                                <div data-role="content" style="max-width: 400px;">
+                                    <p>OpenWiFiMap is
+                                    <ul>
+                                        <li>free software licensed under the MIT License.</li>
+                                        <li>available at <a href="https://github.com/andrenarchy/openwifimap">github</a>. Please submit code, bug reports or ideas for improvements there!</li>
+                                        <li>meant to support free networks (free as in 'free speech', not 'free beer') like <a href="http://www.freifunk.net">freifunk</a>.</li>
+                                        <li>a <a href="http://couchapp.org/page/index">CouchApp</a> and you can thus easily run your own instance by pushing it to your CouchDB server.</li>
+                                        <li>inspired by the <a href="http://heartbeat.basicinside.de/">Freifunk heartbeat site</a>.</li>
+                                        <li>written by <a href="http://page.math.tu-berlin.de/~gaul">Andr&eacute; Gaul</a>.</li>
+                                    </ul>
+                                    The WiFi icon was created by <a href="http://commons.wikimedia.org/wiki/User:Canopus49">Canopus49</a> and is licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/deed.en">CC-BY-SA</a>.
+                                    </p>
+                                    <a data-role="button" onclick="$('#about').popup( 'close' )" data-theme="b">Close</a>
+                                </div>
                             </div>
                         </div>
+                        <div class="ui-block-b"></div>
+                        <div class="ui-block-c"><a id="listlink" href="#list" data-role="button" data-transition="slide" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-mini="false">List</a></div>
                     </div>
-                    <div class="ui-block-b"></div>
-                    <div class="ui-block-c"><a id="listlink" href="#list" data-role="button" data-transition="slide" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-mini="false">List</a></div>
                 </div>
             </div>
         </div>
         
         <div data-role="page" id="list" data-theme="b">
-             <div data-role="header">
-                <h1>OpenWiFiMap &ndash; List</h1>
-            </div>
-            <div id="listdiv" data-role="content"> 
-            </div>
-            <div data-role="footer">
-                <div class="ui-grid-b">
-                    <div class="ui-block-a"><a id="maplink" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</a></div>
-                    <div class="ui-block-b"></div>
-                    <div class="ui-block-c"></div>
+            <div id="container">
+                 <div data-role="header" id="header">
+                    <h1>OpenWiFiMap &ndash; List</h1>
+                </div>
+                <div id="content" data-role="content"> 
+                    <div id="listdiv"> 
+                    </div>
+                </div>
+                <div data-role="footer" id="footer">
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a"><a id="maplink" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</a></div>
+                        <div class="ui-block-b"></div>
+                        <div class="ui-block-c"></div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <div data-role="page" id="detail" data-theme="b">
-            <div data-role="header">
-                <h1>OpenWiFiMap &ndash; Details</h1>
-            </div>
-            <div id="detaildiv" data-role="content">
-            </div>
-            <div data-role="footer">
-                <div class="ui-grid-b">
-                    <div class="ui-block-a"><a id="detailback" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</button></a></div>
-                    <div class="ui-block-b"></div>
-                    <div class="ui-block-c"></div>
+            <div id="container">
+                <div data-role="header" id="header">
+                    <h1>OpenWiFiMap &ndash; Details</h1>
+                </div>
+                <div id="content" data-role="content">
+                    <div id="detaildiv" data-role="content">
+                    </div>
+                </div>
+                <div data-role="footer" id="footer">
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a"><a id="detailback" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</button></a></div>
+                        <div class="ui-block-b"></div>
+                        <div class="ui-block-c"></div>
+                    </div>
                 </div>
             </div>
         </div>

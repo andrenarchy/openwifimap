@@ -1,7 +1,37 @@
-html, body, #content, #map, #mapdiv, #detailmap {
-    width: 100%; 
-    height: 100%;
+html, body, #map, #mapdiv, #detailmap {
     padding: 0;
+    margin: 0;
+}
+
+#mapdiv {
+    height: 100%;
+    width: 100%;
+}
+
+#container {
+    height: 100%;
+    width: 100%;
+}
+#header {
+    height: 50px;
+    width: 100%;
+}
+#content {
+    position: absolute;
+    width: 100%;
+    top: 52px;
+    bottom: 61px;
+    padding: 0;
+    overflow: auto;
+}
+#footer {
+    height: 59px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+#listul {
     margin: 0;
 }
 
