@@ -36,7 +36,18 @@ html, body, #map, #mapdiv, #detailmap {
 }
 
 table { width:100%; }
-table.fifty td { vertical-align:top; padding:6px; width: 50%; } 
+/*table.fifty td { vertical-align:top; padding:6px; width: 50%; } */
+
+table.fifty td {
+    padding: 3px;
+    vertical-align: middle;
+    width: 50%;
+}
+
+table.fifty .cola {
+    background: none repeat scroll 0 0 #D8D8D8;
+}
+/* LG Daniel */
 
 #avatar {
     vertical-align: middle;
