@@ -158,6 +158,13 @@
                 $("a#listlink .ui-btn-text").text("List (" + nodes.length + ")" );
             }
 
+            function mappagemapResize() {
+                if (mappagemap) {
+                    ignoreNextHashChange = true;
+                    mappagemap.map.invalidateSize(true);
+                }
+            }
+
             $('#map').live('pageshow', function() {
                 var bbox = null;
                 if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
@@ -184,17 +191,14 @@
                     */
 
                     // might zoom out a bit without nasty hack ;)
+                    mappagemapResize();
+                    ignoreNextHashChange = true;
                     mappagemap.map.fitBounds(bbox);
                 }
             });
 
-            function mappagemapResize() {
-                if (mappagemap) {
-                    mappagemap.map.invalidateSize();
-                }
-            }
-
             $(window).bind("pageshow resize", mappagemapResize);
+
 
             //////////////////////////////////////////////////////////
             // list page
@@ -240,7 +244,8 @@
                 var map = $("#detailmap");
                 map.height( map.width()*0.5 );
                 if (detailpagemap) {
-                    detailpagemap.map.invalidateSize();
+                    //TODO: fix! :D
+                    //detailpagemap.map.invalidateSize();
                 }
             }
 
