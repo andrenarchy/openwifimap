@@ -1,6 +1,7 @@
 html, body, #map, #mapdiv, #detailmap {
     padding: 0;
     margin: 0;
+    overflow: hidden;
 }
 
 #mapdiv {
