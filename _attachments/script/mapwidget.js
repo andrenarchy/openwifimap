@@ -236,14 +236,15 @@ mapwidget.prototype.addAntennaMarkers = function(antennas, latlng) {
 }
 
 mapwidget.prototype.addNodeMarker = function(nodedata) {
-    return L.circleMarker(nodedata.latlng, 
+    var circle = L.circleMarker(nodedata.latlng, 
         {
             fillColor: "#00FF00", 
             fillOpacity: 0.5, 
             weight: 3, 
             color: "#009900", 
             opacity: 0.8
-        }).setRadius(15).addTo(this.layer_nodes).bindPopup(this.getPopupHTML(nodedata));
+        }).setRadius(15).addTo(this.layer_nodes);
+    return circle.bringToFront().bindPopup(this.getPopupHTML(nodedata));
 }
 
 mapwidget.prototype.addNeighbor = function(id1, id2) {
@@ -254,9 +255,11 @@ mapwidget.prototype.addNeighbor = function(id1, id2) {
         return
     }
 
-    var line = L.polyline([node1.data.latlng,node2.data.latlng], {clickable: false}).addTo(this.layer_neighborlinks)
+    var line = L.polyline([node1.data.latlng,node2.data.latlng]/*, {clickable: false}*/).addTo(this.layer_neighborlinks);
+    line.bringToBack();
     node1.neighbor_lines[id2] = line;
     node2.neighbor_lines[id1] = line;
+    return line;
 }
 
 mapwidget.prototype.addNode = function(nodedata) {
