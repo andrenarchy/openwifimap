@@ -126,7 +126,7 @@ function mappageOnNodeUpdate(bboxstr, nodes) {
 function mappagemapResize() {
     if (mappagemap) {
         ignoreNextHashChange = true;
-        mappagemap.map.invalidateSize(true);
+        mappagemap.map.invalidateSize();
     }
 }
 
@@ -187,7 +187,7 @@ $('#list').live('pagebeforeshow', function (){
         if (bboxstr == nodecache.bboxstr) {
             listUpdate(nodecache);
         } else {
-            $.getJSON('_spatial/nodes', { "bbox": bboxstr }, function(data) {
+            $.getJSON('_spatial/nodes_essentials', { "bbox": bboxstr }, function(data) {
                 var nodes = [];
                 for (var i=0; i<data.rows.length; i++) {
                     nodes.push(data.rows[i].value);
@@ -209,8 +209,7 @@ function detailmapResize() {
     var map = $("#detailmap");
     map.height( map.width()*0.5 );
     if (detailpagemap) {
-        //TODO: fix! :D
-        //detailpagemap.map.invalidateSize();
+        detailpagemap.map.invalidateSize();
     }
 }
 
@@ -256,12 +255,12 @@ $('#detail').live('pagebeforeshow', function (){
                     $("#avaframe").empty().append( '<img id="avatar" src="' + avatarurl + '" />' );
                 }
 
-                detailmapResize();
                 if (!detailpagemap) {
                     detailpagemap = new mapwidget('detailmap', getPopupHTML);
                 } else {
                     $("#detailmapcontainer").empty().append(mapdiv);
                 }
+                detailmapResize();
                 detailpagemap.map.setView([data.latitude,data.longitude], 16);
                 $("#detailmapcenter").click( function () {
                     detailpagemap.map.setView([data.latitude,data.longitude], 16);

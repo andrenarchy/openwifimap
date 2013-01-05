@@ -35,7 +35,7 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     this.map.on('moveend', this.onMoveEnd.bind(this));
 
     /* nodes[id] = { 
-        data: data from _spatial/nodes view, i.e.
+        data: data from _spatial/nodes_essentials view, i.e.
             {
                 id:
                 hostname:
@@ -107,7 +107,7 @@ mapwidget.prototype.onMoveEnd = function(e) {
     if (this.onBBOXChange) {
         this.onBBOXChange(bboxstr);
     }
-    $.getJSON('_spatial/nodes', { "bbox": bboxstr }, (function(data) {
+    $.getJSON('_spatial/nodes_essentials', { "bbox": bboxstr }, (function(data) {
             var missing_neighbors = {};
             var bbox_nodes = [];
             for (var row_idx=0; row_idx<data.rows.length; row_idx++) {
