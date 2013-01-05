@@ -8,15 +8,15 @@ html, body, #map, #mapdiv, #detailmap {
     width: 100%;
 }
 
-#container {
+div#container {
     height: 100%;
     width: 100%;
 }
-#header {
+#container > div[data-role="page"] > div[data-role="header"] {
     height: 50px;
     width: 100%;
 }
-#content {
+#container > div[data-role="page"] > div[data-role="content"] {
     position: absolute;
     width: 100%;
     top: 52px;
@@ -24,7 +24,7 @@ html, body, #map, #mapdiv, #detailmap {
     padding: 0;
     overflow: auto;
 }
-#footer {
+#container > div[data-role="page"] > div[data-role="footer"] {
     height: 59px;
     width: 100%;
     position: absolute;

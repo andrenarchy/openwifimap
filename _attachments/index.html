@@ -166,15 +166,16 @@
     </head>
 
     <body>
-        <div data-role="page" data-theme="b" id="map">
-            <div id="container">
-                <div data-role="header" id="header">
+        <div id="container">
+
+            <div data-role="page" data-theme="b" id="map">
+                <div data-role="header">
                     <h1>OpenWiFiMap</h1>
                 </div>
-                <div data-role="content" id="content">
+                <div data-role="content">
                     <div id="mapdiv"></div>
                 </div>
-                <div data-role="footer" id="footer">
+                <div data-role="footer">
                     <div class="ui-grid-b">
                         <div class="ui-block-a">
                             <a href="#about" data-role="button" data-rel="popup" data-position-to="window" data-transition="fade" data-mini="false">About</a>
@@ -203,18 +204,16 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div data-role="page" id="list" data-theme="b">
-            <div id="container">
-                 <div data-role="header" id="header">
+
+            <div data-role="page" id="list" data-theme="b">
+                 <div data-role="header">
                     <h1>OpenWiFiMap &ndash; List</h1>
                 </div>
-                <div id="content" data-role="content"> 
+                <div data-role="content"> 
                     <div id="listdiv"> 
                     </div>
                 </div>
-                <div data-role="footer" id="footer">
+                <div data-role="footer">
                     <div class="ui-grid-b">
                         <div class="ui-block-a"><a id="maplink" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</a></div>
                         <div class="ui-block-b"></div>
@@ -222,18 +221,16 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div data-role="page" id="detail" data-theme="b">
-            <div id="container">
-                <div data-role="header" id="header">
+
+            <div data-role="page" id="detail" data-theme="b">
+                <div data-role="header">
                     <h1>OpenWiFiMap &ndash; Details</h1>
                 </div>
-                <div id="content" data-role="content">
+                <div data-role="content">
                     <div id="detaildiv" data-role="content">
                     </div>
                 </div>
-                <div data-role="footer" id="footer">
+                <div data-role="footer">
                     <div class="ui-grid-b">
                         <div class="ui-block-a"><a id="detailback" href="#map" data-role="button" data-transition="slide" data-direction="reverse" data-theme="b" data-icon="arrow-l" data-iconpos="left" data-mini="false">Map</button></a></div>
                         <div class="ui-block-b"></div>
@@ -241,6 +238,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </body>
 </html>
