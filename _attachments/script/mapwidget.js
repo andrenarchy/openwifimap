@@ -18,7 +18,8 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     // layer_antennas will be added to and removed from this meta layer depending on the current zoom level
     this.layer_antennas_meta = L.layerGroup().addTo(this.map); 
     this.layer_neighborlinks = L.layerGroup().addTo(this.map);
-    this.layer_nodes = L.layerGroup().addTo(this.map);
+    this.layer_nodes = new L.MarkerClusterGroup().addTo(this.map);
+        //L.layerGroup().addTo(this.map);
     L.control.layers(
         {
             "Cloudmade OSM": this.tile_cloudmade,
@@ -180,11 +181,11 @@ mapwidget.prototype.onZoomEnd = function(e) {
     var zoom = this.map.getZoom();
     var threshold = 16;
     if (zoom>=threshold && !this.layer_antennas_added) {
-        this.layer_antennas_meta.addLayer( this.layer_antennas );
+//        this.layer_antennas_meta.addLayer( this.layer_antennas );
         this.layer_antennas_added = true;
     }
     if (zoom<threshold && this.layer_antennas_added) {
-        this.layer_antennas_meta.removeLayer( this.layer_antennas );
+//        this.layer_antennas_meta.removeLayer( this.layer_antennas );
         this.layer_antennas_added = false;
     }
 }
@@ -253,15 +254,14 @@ mapwidget.prototype.addAntennaMarkers = function(antennas, latlng) {
 }
 
 mapwidget.prototype.addNodeMarker = function(nodedata) {
-    var circle = L.circleMarker(nodedata.latlng, 
-        {
-            fillColor: "#00FF00", 
-            fillOpacity: 0.5, 
-            weight: 3, 
-            color: "#009900", 
-            opacity: 0.8
-        }).setRadius(15).addTo(this.layer_nodes);
-    return circle.bringToFront().bindPopup(this.getPopupHTML(nodedata));
+    var circle = new L.Marker( nodedata.latlng, 
+            {
+                title: nodedata.hostname,
+                icon: L.icon( {iconUrl: 'images/node_circle.svg', iconSize: [30,30], iconAnchor: [15,15]})
+            });
+    circle.bindPopup(this.getPopupHTML(nodedata));
+    circle.addTo(this.layer_nodes);
+    return circle;
 }
 
 mapwidget.prototype.addNeighbor = function(id1, id2) {
