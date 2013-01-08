@@ -13,7 +13,10 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     // https://raw.github.com/shramov/leaflet-plugins/master/layer/tile/Bing.js
     this.tile_bing = new L.BingLayer("ArewtcSllazYp52r7tojb64N94l-OrYWuS1GjUGeTavPmJP_jde3PIdpuYm24VpR");
 
-    this.layer_antennas = L.layerGroup().addTo(this.map);
+    this.layer_antennas = L.layerGroup();
+    this.layer_antennas_added = false;
+    // layer_antennas will be added to and removed from this meta layer depending on the current zoom level
+    this.layer_antennas_meta = L.layerGroup().addTo(this.map); 
     this.layer_neighborlinks = L.layerGroup().addTo(this.map);
     this.layer_nodes = L.layerGroup().addTo(this.map);
     L.control.layers(
@@ -22,7 +25,7 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
             "Bing satellite": this.tile_bing
         },
         {
-            "Antennas": this.layer_antennas,
+            "Antennas": this.layer_antennas_meta,
             "Neighbor links": this.layer_neighborlinks,
             "Nodes": this.layer_nodes
         }
@@ -33,6 +36,7 @@ function mapwidget(divId, getPopupHTML, onBBOXChange, onNodeUpdate) {
     this.map.on('locationfound', this.onLocationFound.bind(this));
     this.map.on('locationerror', this.onLocationError.bind(this));
     this.map.on('moveend', this.onMoveEnd.bind(this));
+    this.map.on('zoomend', this.onZoomEnd.bind(this));
 
     /* nodes[id] = { 
         data: data from _spatial/nodes_essentials view, i.e.
@@ -170,6 +174,20 @@ mapwidget.prototype.onMoveEnd = function(e) {
 
             }
         }).bind(this));
+}
+
+mapwidget.prototype.onZoomEnd = function(e) {
+    var zoom = this.map.getZoom();
+    var threshold = 16;
+    console.log(this)
+    if (zoom>=threshold && !this.layer_antennas_added) {
+        this.layer_antennas_meta.addLayer( this.layer_antennas );
+        this.layer_antennas_added = true;
+    }
+    if (zoom<threshold && this.layer_antennas_added) {
+        this.layer_antennas_meta.removeLayer( this.layer_antennas );
+        this.layer_antennas_added = false;
+    }
 }
 
 function getAntennaIconSVG(h, w, antenna) {
