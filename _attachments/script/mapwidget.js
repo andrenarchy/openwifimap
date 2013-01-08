@@ -179,7 +179,6 @@ mapwidget.prototype.onMoveEnd = function(e) {
 mapwidget.prototype.onZoomEnd = function(e) {
     var zoom = this.map.getZoom();
     var threshold = 16;
-    console.log(this)
     if (zoom>=threshold && !this.layer_antennas_added) {
         this.layer_antennas_meta.addLayer( this.layer_antennas );
         this.layer_antennas_added = true;
