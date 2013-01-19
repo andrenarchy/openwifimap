@@ -15,10 +15,11 @@ To make URLs nicer you can use CouchDB URL rewrites. If your CouchDB is accessed
 * value: `/openwifimap/_design/openwifimap/_rewrite`
 
 # Developers corner
-## Documentation of JSON format for nodes
-### Example of required fields
-We all love documentation by example, so here is one. There are a few required fields in a node document. 
-This is a node document that would result in an icon on the map:
+## Documentation of node documents
+Each node **must update its data at least once a day**. If a node is not updated for several days it is considered to be offline and removed from the map. 
+
+### Required fields
+We all love documentation by example, so here is one. There are a few required fields in a node document. This is a node document that would result in an icon on the map:
 ```javascript
 {
   "_id": "a4d15a897f851938a799e548cc000eb0",
@@ -27,17 +28,56 @@ This is a node document that would result in an icon on the map:
   "hostname": "myhostname",             // required: hostname == display name
   "longitude": 13.40951,                // required: longitude in degrees, range [-90,90], EPSG:3857
   "latitude": 52.520791,                // required: latitude in degrees, range [-180,180], EPSG:3857
-  "lastupdate": "2013-01-12T12:30:12Z", // required: timestamp of last update in UTC
+  "lastupdate": "2013-01-12T12:30:12Z"  // required: timestamp of last update in UTC
 }
 ```
-### Example of optional fields
+### Optional fields
+While nothing is wrong with only pushing the required fields, you probably want to provide further information about the node. 
+
+#### Neighbors
+The ```neighbors``` field's value should be a list of neighbor nodes. Links between neighbors will be shown as lines in the map. The quality field is required for each field.
+```javascript
+  "neighbors": [
+    {
+      "id": "a4d15a897f851938a799e548cc0017e7",  // document id of the neighbor node
+      "quality": 1                               // quality of the link, range [0,1], 0==no link, 1==perfect link
+    },
+    {
+      "id": "host2",
+      "quality": 0.39016
+    }
+  ]
+```
+You can provide additional fields in neighbor objects, for example the used routing protocol and its parameters in a mesh network (such as [OLSR](http://en.wikipedia.org/wiki/Optimized_Link_State_Routing_Protocol) in some [freifunk](http://en.wikipedia.org/wiki/Freifunk) networks):
+```javascript
+  "neighbors": [
+    {
+      "id": "host2",
+      "quality": 0.39016,                 // for olsr, 1/etx could be used
+      "olsr_ipv4": {                      // additional data
+        "local_ip": "104.201.1.1",
+        "neighbor_ip": "104.201.1.18",
+        "lq": 0.533,
+        "nlq": 0.732,
+        "etx": 2.5631
+      },
+      "olsr_ipv6": {                      // additional data
+        "local_ip": "2002:4e35:28e7:bd9d::1",
+        "neighbor_ip": "2002:4e35:28e7:be2c::1",
+        "lq": 0.533,
+        "nlq": 0.732,
+        "etx": 2.5631
+      },
+    }
+  ]
+```
 ```javascript
 {
-  // *************************************
-  // insert all of the above example here!
-  // *************************************
+  // *******************************************
+  // insert all required fields here (see above)
+  // *******************************************
   "created": "2013-01-06T01:33:52Z",    // timestamp of creation in UTC
-  "height": 10,                         // height in meters above ground
+  "height": 15.5,                       // height in meters above ground level
   "indoor": true,                       // is this node mounted indoors?
   "address": {
     "street": "Alexanderplatz 1",
@@ -48,7 +88,8 @@ This is a node document that would result in an icon on the map:
   "firmware": {
     "name": "openwrt",
     "revision": "r1234",
-    "url": "https://firmwar.ez/"
+    "url": "http://firmware.pberg.freifunk.net/attitude_adjustment/12.09/ar71xx/openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-factory.bin",
+    "installed_packages": [ "olsrd", "dnsmasq", "kmod-ath9k" ]
   },
   "hardware": {
     "manufacturer": "Ubiquiti",
