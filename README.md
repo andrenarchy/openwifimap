@@ -16,8 +16,9 @@ To make URLs nicer you can use CouchDB URL rewrites. If your CouchDB is accessed
 
 # Developers corner
 ## Documentation of JSON format for nodes
-### Example
-We all love documentation by example, so here it is:
+### Example of required fields
+We all love documentation by example, so here is one. There are a few required fields in a node document. 
+This is a node document that would result in an icon on the map:
 ```javascript
 {
   "_id": "a4d15a897f851938a799e548cc000eb0",
@@ -27,6 +28,14 @@ We all love documentation by example, so here it is:
   "longitude": 13.40951,                // required: longitude in degrees, range [-90,90], EPSG:3857
   "latitude": 52.520791,                // required: latitude in degrees, range [-180,180], EPSG:3857
   "lastupdate": "2013-01-12T12:30:12Z", // required: timestamp of last update in UTC
+}
+```
+### Example of optional fields
+```javascript
+{
+  // *************************************
+  // insert all of the above example here!
+  // *************************************
   "created": "2013-01-06T01:33:52Z",    // timestamp of creation in UTC
   "height": 10,                         // height in meters above ground
   "indoor": true,                       // is this node mounted indoors?
