@@ -32,7 +32,7 @@ We all love documentation by example, so here is one. There are a few required f
 }
 ```
 ### Optional fields
-While nothing is wrong with only pushing the required fields, you probably want to provide further information about the node. 
+While nothing is wrong with only pushing the required fields, you probably want to provide further information about the node. There are several fields that are recognized by the openwifimap couchapp, while you can add *any* other information about your node. Just make sure that you provide valid JSON and use the recognized fields correctly.
 
 #### Neighbors
 The ```neighbors``` field's value should be a list of neighbor nodes. Links between neighbors will be shown as lines in the map. The quality field is required for each field.
