@@ -16,7 +16,7 @@ To make URLs nicer you can use CouchDB URL rewrites. If your CouchDB is accessed
 
 # Developers corner
 ## Documentation of node documents
-Each node **must update its data at least once a day**. If a node is not updated for several days it is considered to be offline and removed from the map. 
+Each node's data **must be updated at least once a day**. If a node is not updated for several days it is considered to be offline and removed from the map. 
 
 ### Required fields
 We all love documentation by example, so here is one. There are a few required fields in a node document. This is a node document that would result in an icon on the map:
