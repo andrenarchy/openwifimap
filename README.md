@@ -31,6 +31,7 @@ We all love documentation by example, so here is one. There are a few required f
   "lastupdate": "2013-01-12T12:30:12Z"  // required: timestamp of last update in UTC
 }
 ```
+
 ### Optional fields
 While nothing is wrong with only pushing the required fields, you probably want to provide further information about the node. There are several fields that are recognized by the openwifimap couchapp, while you can add *any* other information about your node. Just make sure that you provide valid JSON and use the recognized fields correctly.
 
@@ -53,7 +54,7 @@ You can provide additional fields in neighbor objects, for example the used rout
   "neighbors": [
     {
       "id": "host2",
-      "quality": 0.39016,                 // for olsr, 1/etx could be used
+      "quality": 0.39016,                 // for olsr, 1/etx can be used (be aware of dividing by zero)
       "olsr_ipv4": {                      // additional data
         "local_ip": "104.201.1.1",
         "neighbor_ip": "104.201.1.18",
@@ -71,112 +72,118 @@ You can provide additional fields in neighbor objects, for example the used rout
     }
   ]
 ```
+
+#### Network interfaces and antennas
+Each node can have several network interfaces. Provide as many details as possible to improve the presentation of the node in the map and on the detail page of OpenWiFiMap.
 ```javascript
-{
-  // *******************************************
-  // insert all required fields here (see above)
-  // *******************************************
-  "created": "2013-01-06T01:33:52Z",    // timestamp of creation in UTC
-  "height": 15.5,                       // height in meters above ground level
-  "indoor": true,                       // is this node mounted indoors?
-  "address": {
+  "interfaces": [
+    // wire interface eth0
+    {
+      "name": "eth0",                    // required: name of the network interface
+      "type": "ethernet",                // required: either 'ethernet' or 'wifi'
+      "macAddress": "00:66:77:88:99:AA", // the MAC address
+      "maxBitrateRX": 100,               // max receive bitrate in Mbit/s
+      "maxBitrateTX": 100,               // max transmit bitrate in Mbit/s
+      "ipv4Addresses": [                 // list of ipv4 addresses+subnets in CIDR notation
+        "104.201.0.29/28"
+      ],
+      "ipv6Addresses": [                 // list of ipv6 addresses+subnets in CIDR notation
+        "dead:beef::2/56",
+        "0455:dead::1235/64"
+      ]
+    },
+    // wifi interface wlan0
+    {
+      "name": "wlan0",
+      "type": "wifi",
+      "macAddress": "00:11:22:33:44:55",
+      "maxBitrateRX": 300,
+      "maxBitrateTX": 300,
+      "ipv4Addresses": ["104.201.111.1/28"],
+      "ipv6Addresses": ["1234:5678::1/64"],
+      // wifi fields:
+      "mode": "master",                     // 802.11 operation mode: 'master' (access point), 'client' or 'adhoc'
+      "encryption": "none",                 // used encryption: 'none', 'wep', 'wpa', 'wpa2', ...
+      "access": "free",                     // access policy:
+                                            //   * 'free' as in freedom: use if everyone can use this network
+                                            //     without password, prior registration and restrictions.
+                                            //     This means no time limit or port restrictions!
+                                            //     However, a splash screen with information fits into
+                                            //     this definition.
+                                            //   * 'password': use if everyone can obtain the password for free,
+                                            //     and without registration, for example at the bar in your pub.
+                                            //   * 'registration': use if everyone can use this network
+                                            //     after registration but without any further restrictions.
+                                            //   * 'restricted': use if time limits or port blocks are enforced
+                                            //     in this network. Shame on you!
+                                            //   * 'pay': use if users have to pay in order to use this network.
+                                            //     Shame on you capitalist b4st4rd!
+      "accessNote": "everyone is welcome!"  // a message explaining your access policy.
+      "channel": 10,                        // channel number, see http://en.wikipedia.org/wiki/List_of_WLAN_channels
+      "txpower": 15,                        // transmit power in dBm
+      "bssid": "00:11:22:33:44:55",         // BSSID
+      "essid": "liebknecht.freifunk.net",   // ESSID
+      "dhcpSubnet": "104.201.111.1/28",     // offered ipv4 DCHP address subnet in CIDR notation
+      "radvdPrefixes": [                    // list of advertised ipv6 prefixes in CIDR notation
+        "1234:5678::/64"
+      ],
+      "antenna": {                          // description of the antenna that is attached to this interface
+        "builtin": false,                   // is this antenna built into the device?
+        "manufacturer": "IT ELITE",         // if isbuiltin==false: antenna manufacturer
+        "model": "PAT24014",                // if isbuiltin==false: antenna model
+        "type": "directed",                 // type of antenna: 'omni' or 'directed'
+        "gain": 5,                          // antenna gain in dBi
+        "horizontalDirection": 310,         // if type=='directed': horizontal direction of antenna in degrees, 
+                                            //   range [0,360], 0 is north, 90 is east,... you got it!
+        "horizontalBeamwidth": 120,         // horizontal beamwidth of antenna in degrees, range [0,360],
+                                            //   value of 60 means that the antennas main beam is between
+                                            //   horizontalDirection-30 and horizontalDirection+30 degrees
+        "verticalDirection": -12.3,         // tilt of the antenna in degrees, range [-90,90],
+                                            //   -90 means oriented towards ground, 0 parallel to ground,
+                                            //   90 means oriented towards sky
+        "verticalBeamwidth": 17,            // vertical beamwidth of antenna in degrees, range [-90,90],
+                                            //   see horizontalBeamwidth
+        "polarization": "vertical"          // polarization of antenna
+      }
+    }
+  ]
+```
+
+#### Postal address
+```javascript
+  "postalAddress": {
     "street": "Alexanderplatz 1",
     "zip": "10178",
     "city": "Berlin",
     "country": "Germany"
-  },
+  }
+```
+
+#### Firmware
+```javascript
   "firmware": {
     "name": "openwrt",
     "revision": "r1234",
     "url": "http://firmware.pberg.freifunk.net/attitude_adjustment/12.09/ar71xx/openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-factory.bin",
     "installed_packages": [ "olsrd", "dnsmasq", "kmod-ath9k" ]
-  },
+  }
+```
+
+#### Hardware
+```javascript
   "hardware": {
     "manufacturer": "Ubiquiti",
     "model": "Bullet M2"
     "revision": "3.5",
-    "antenna": "IT ELITE PAT24014",
     "powersupply": "Ubiquiti PoE 24V"
-  },
-  "interfaces": [
-    {
-      "name": "eth0",
-      "type": "ethernet",
-      "macAddress": "00:66:77:88:99:AA",
-      "maxBitrateDown": 100,
-      "maxBitrateUp": 100,
-      "ipv4Addresses": [
-        "104.201.0.29/28"
-        ],
-      "ipv6Addresses": [
-        "dead:beef::2/56",
-      "0455:dead::1235/64"
-        ]
-    },
-    {
-      "name": "wlan0",
-      "type": "wifi",
-      "macAddress": "00:77:88:66:44:66",
-      "maxBitrateDown": 500,
-      "maxBitrateUp": 500,
-      "ipv4Addresses": [
-        "104.201.1.29/8"
-      ],
-      "ipv6Addresses": [
-        "dead:beef:1:1/56",
-        "0455:dead:1:1234/64"
-      ],
-      "essid": "olsr.freifunk.net",
-      "bssid": "00:CA:FF:EE:BA:BE",
-      "channel": 10,
-      "wifiStandard": "802.11n",
-      "mode": "adhoc",
-      "encryption": "none",
-      "chipName": "AR9100",
-      "driverName": "ath9k",
-      "driverRevision": "a59d8e5f8f13ede04e7c570bb4c9460d84a32562",
-      "txpower": 15,
-      "antenna": {
-        "gain": 5,
-        "isbuiltin": false,
-        "type": "directed",
-        "direction": 127,
-        "tilt": -12.3,
-        "beamH": 35,
-        "beamV": 17,
-        "polarization": "vertical"
-      },
-      "access": "open",
-      "accessNote": "free as in freedom!"
-    },
-    {
-      "name": "wlan1",
-      "type": "wifi",
-      "essid": "liebknecht.freifunk.net",
-      "mode": "ap",
-      "dhcpSubnet": "104.201.111.1/28",
-      "radvdPrefixes": [
-        "1234:5678::/64"
-      ],
-      "antenna": {
-        "gain": 5,
-        "isbuiltin": false,
-        "type": "directed",
-        "direction": 310,
-        "tilt": -12.3,
-        "beamH": 120,
-        "beamV": 17,
-        "polarization": "vertical"
-      }
-    },
-    {
-      "name": "ppp0",
-      "type": "ethernet",
-      "maxBitrateDown": 16000,
-      "maxBitrateUp": 1024,
-      "providesUplink": true
-    }
-  ],
+  }
+```
+
+#### Other fields
+```javascript
+  "created": "2013-01-06T01:33:52Z",    // timestamp of creation in UTC
+  "height": 15.5,                       // height in meters above ground level
+  "indoor": true,                       // is this node placed indoors?
   "updateInterval": 600,
   "ipv4defaultGateway": "104.201.0.33",
   "ipv6defaultGateway": "dead:1337::1",
@@ -194,7 +201,6 @@ You can provide additional fields in neighbor objects, for example the used rout
       "stub": true
     }
   }
-}
 ```
 
 # License
