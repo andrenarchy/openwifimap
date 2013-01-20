@@ -14,6 +14,9 @@ To make URLs nicer you can use CouchDB URL rewrites. If your CouchDB is accessed
 * option: `myhost.net`
 * value: `/openwifimap/_design/openwifimap/_rewrite`
 
+# License
+openwifimap is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
 # Developers corner
 ## Documentation of node documents
 Each node's data **must be updated at least once a day**. If a node is not updated for several days it is considered to be offline and removed from the map. 
@@ -202,6 +205,3 @@ Each node can have several network interfaces. Provide as many details as possib
     }
   }
 ```
-
-# License
-openwifimap is licensed under the [MIT license](http://opensource.org/licenses/MIT).
