@@ -22,8 +22,8 @@ Each node **must update its data at least once a day**. If a node is not updated
 We all love documentation by example, so here is one. There are a few required fields in a node document. This is a node document that would result in an icon on the map:
 ```javascript
 {
-  "_id": "a4d15a897f851938a799e548cc000eb0",
-  "_rev": "22-95f616b25babe186cef05c744657b894",
+  "_id": "a4d15a897f851938a799e548cc000eb0",      // required by CouchDB: document id
+  "_rev": "22-95f616b25babe186cef05c744657b894",  // required by CouchDB: revision of document
   "type": "node",                       // required: tells couchDB that this is a node
   "hostname": "myhostname",             // required: hostname == display name
   "longitude": 13.40951,                // required: longitude in degrees, range [-90,90], EPSG:3857
@@ -35,7 +35,7 @@ We all love documentation by example, so here is one. There are a few required f
 While nothing is wrong with only pushing the required fields, you probably want to provide further information about the node. There are several fields that are recognized by the openwifimap couchapp, while you can add *any* other information about your node. Just make sure that you provide valid JSON and use the recognized fields correctly.
 
 #### Neighbors
-The ```neighbors``` field's value should be a list of neighbor nodes. Links between neighbors will be shown as lines in the map. The quality field is required for each field.
+The `neighbors` field's value should be a list of neighbor nodes. Links between neighbors will be shown as lines in the map. The quality field is required for each field.
 ```javascript
   "neighbors": [
     {
@@ -48,7 +48,7 @@ The ```neighbors``` field's value should be a list of neighbor nodes. Links betw
     }
   ]
 ```
-You can provide additional fields in neighbor objects, for example the used routing protocol and its parameters in a mesh network (such as [OLSR](http://en.wikipedia.org/wiki/Optimized_Link_State_Routing_Protocol) in some [freifunk](http://en.wikipedia.org/wiki/Freifunk) networks):
+You can provide additional fields in neighbor objects, for example the used routing protocol and its data in a mesh network (such as [OLSR](http://en.wikipedia.org/wiki/Optimized_Link_State_Routing_Protocol) or [B.A.T.M.A.N.](http://de.wikipedia.org/wiki/B.A.T.M.A.N.) in [freifunk](http://en.wikipedia.org/wiki/Freifunk) networks):
 ```javascript
   "neighbors": [
     {
@@ -184,16 +184,6 @@ You can provide additional fields in neighbor objects, for example the used rout
     "Berlin",
     "freifunk",
     "Kreuzberg"
-  ],
-  "neighbors": [
-    {
-      "id": "a4d15a897f851938a799e548cc0017e7",
-      "quality": 1
-    },
-    {
-      "id": "blaaa",
-      "quality": 0.1
-    }
   ],
   "_attachments": {
     "avatar.jpg": {
