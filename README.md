@@ -155,8 +155,9 @@ Each node can have several network interfaces. Provide as many details as possib
 #### Postal address
 ```javascript
   "postalAddress": {
-    "street": "Alexanderplatz 1",
-    "zip": "10178",
+    "name": "Café Kotti",
+    "street": "  Adalbertstraße 96",
+    "zip": "10999",
     "city": "Berlin",
     "country": "Germany"
   }
