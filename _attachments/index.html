@@ -100,14 +100,14 @@
                         <div class="ui-block-a" id="detailmapcontainer"><div id="detailmap"></div></div>
                         <div class="ui-block-b"><div class="ui-bar">
                             <p>
-                            {{#address}}
-                                <h4>Address</h4>
-                                {{placeName}}<br />
+                            {{#postalAddress}}
+                                <h4>Postal address</h4>
+                                {{name}}<br/>
                                 {{street}}<br/>
                                 {{zip}} {{city}}<br/>
                                 {{country}}
-                            {{/address}}
-                            {{^address}}No address is stored for this node.{{/address}}
+                            {{/postalAddress}}
+                            {{^postalAddress}}No address is stored for this node.{{/postalAddress}}
                             </p>
                             <a id="detailmapcenter" data-role="button" data-icon="home">Center map</a>
                         </div></div>
