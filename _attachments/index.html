@@ -153,6 +153,32 @@
                         </tr>
                     </table>
                 </div>
+                <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                    <h3>Wireless</h3>
+                    {{#wireless.interfaces}}
+                    <div data-role="collapsible" data-theme="c" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                        <h4>Interface {{device}}</h4>
+                        <table class="fifty">
+                            <tr>
+                                <td>SSID</td>
+                                <td>{{ssid}}</td>
+                            </tr>
+                            <tr>
+                                <td>BSSID</td>
+                                <td>{{bssid}}</td>
+                            </tr>
+                            <tr>
+                                <td>Mode</td>
+                                <td>{{mode}}</td>
+                            </tr>
+                            <tr>
+                                <td>Network</td>
+                                <td>{{network}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    {{/wireless.interfaces}}
+                </div>
                 {{#firmware}}
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
                     <h3>Firmware</h3>
