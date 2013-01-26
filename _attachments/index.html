@@ -179,6 +179,32 @@
                     </div>
                     {{/wireless.interfaces}}
                 </div>
+                <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                    <h3>Wireless devices</h3>
+                    {{#wireless.devices}}
+                    <div data-role="collapsible" data-theme="c" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                        <h4>Interface {{macaddr}}</h4>
+                        <table class="fifty">
+                            <tr>
+                                <td>Channel</td>
+                                <td>{{channel}}</td>
+                            </tr>
+                            <tr>
+                                <td>HWmode</td>
+                                <td>{{hwmode}}</td>
+                            </tr>
+                            <tr>
+                                <td>Type</td>
+                                <td>{{type}}</td>
+                            </tr>
+                            <tr>
+                                <td>Disabled</td>
+                                <td>{{disabled}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    {{/wireless.devices}}
+                </div>
                 {{#firmware}}
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
                     <h3>Firmware</h3>
