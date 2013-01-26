@@ -47,11 +47,19 @@
 
         var clusterdata = [];
         for (var i = 0, cluster; cluster = this.clusters[i]; i++) {
+            var radius = 0;
+            for (var j = 0, point; point = cluster.points[j]; j++) {
+                radius = Math.max(radius, gju.pointDistance(cluster.center, 
+                            point.geometry)/1000);
+            }
             clusterdata.push({
                 "latlng": [
                     cluster.center.coordinates[1], 
                     cluster.center.coordinates[0]
-               ], "size": cluster.getSize()});
+                ],
+                "size": cluster.getSize(),
+                "radius": radius
+            });
         }
         return clusterdata;
     }
