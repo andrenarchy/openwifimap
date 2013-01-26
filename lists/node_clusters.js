@@ -8,7 +8,8 @@ function(head, req) {
     if('threshold' in req.query) { 
         threshold = req.query.threshold;
     }
-    var pc = new g.PointCluster(parseInt(threshold));
+    // threshold in km
+    var pc = new g.PointCluster(parseFloat(threshold));
 
     while (row = getRow()) {
         pc.addToClosestCluster({"geometry": row.geometry});
