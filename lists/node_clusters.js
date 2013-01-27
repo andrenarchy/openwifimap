@@ -8,7 +8,7 @@ function(head, req) {
     if('threshold' in req.query) { 
         threshold = req.query.threshold;
     }
-    // threshold in km
+    // threshold in meters
     var pc = new g.PointCluster(parseFloat(threshold));
 
     while (row = getRow()) {

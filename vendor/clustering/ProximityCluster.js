@@ -25,7 +25,7 @@
             var center = cluster.center;
           
             if (center) {
-                var d = gju.pointDistance(center, pos)/1000; //convert to km
+                var d = gju.pointDistance(center, pos);
 
                 if ( d < this.distanceThreshold) {
                     distance = d;
@@ -50,7 +50,7 @@
             var radius = 0;
             for (var j = 0, point; point = cluster.points[j]; j++) {
                 radius = Math.max(radius, gju.pointDistance(cluster.center, 
-                            point.geometry)/1000);
+                            point.geometry));
             }
             clusterdata.push({
                 "latlng": [
