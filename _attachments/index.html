@@ -113,12 +113,20 @@
                         </div></div>
                     </div>
                 </div>
+                {{#interfaces?}}
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-                    <h3>Network</h3>
+                    <h3>Network interfaces</h3>
                     {{#interfaces}}
                     <div data-role="collapsible" data-theme="c" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
                         <h4>Interface {{name}}</h4>
                         <table class="fifty">
+                            {{#physicalType}}
+                            <tr>
+                                <td>Physical type</td>
+                                <td>{{physicalType}}</td>
+                            </tr>
+                            {{/physicalType}}
+                            {{#ipv4Addresses?}}
                             <tr>
                                 <td>IPv4 addresses</td>
                                 <td>
@@ -127,6 +135,8 @@
                                     {{/ipv4Addresses}}
                                 </td>
                             </tr>
+                            {{/ipv4Addresses?}}
+                            {{#ipv6Addresses?}}
                             <tr>
                                 <td>IPv6 addresses</td>
                                 <td>
@@ -135,10 +145,13 @@
                                     {{/ipv6Addresses}}
                                 </td>
                             </tr>
+                            {{/ipv6Addresses?}}
+                            {{#macAddress}}
                             <tr>
                                 <td>MAC address</td>
                                 <td>{{macAddress}}</td>
                             </tr>
+                            {{/macAddress}}
                         </table>
                     </div>
                     {{/interfaces}}
@@ -153,6 +166,7 @@
                         </tr>
                     </table>
                 </div>
+                {{/interfaces?}}
                 {{#firmware}}
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
                     <h3>Firmware</h3>

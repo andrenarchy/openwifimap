@@ -93,14 +93,13 @@ function getPopupHTML(nodedata) {
 function scanListsObj(obj) {
     if (obj instanceof Array) {
         for (var i=0; i<obj.length; i++) {
-            scan(obj[i]);
+            scanListsObj(obj[i]);
         }
         return obj.length>0
     }
     if (obj instanceof Object) {
         for (var key in obj) {
             var val = obj[key];
-            var nonempty = scan(val);
             if (scanListsObj(val)) {
                 obj[String(key)+"?"] = true;
             }
@@ -259,6 +258,7 @@ $('#detail').live('pagebeforeshow', function (){
                     mapdiv = $("#detailmap").detach();
                 }
                 // i can haz detailed data?
+                scanListsObj(data);
                 $("#detaildiv").empty().append( ich.detailmust(data) ).trigger('create');
 
                 // i can haz avatar?

@@ -83,7 +83,7 @@ Each node can have several network interfaces. Provide as many details as possib
     // wire interface eth0
     {
       "name": "eth0",                    // required: name of the network interface
-      "type": "ethernet",                // required: either 'ethernet' or 'wifi'
+      "physicalType": "ethernet",        // required: either 'ethernet' or 'wifi'
       "macAddress": "00:66:77:88:99:AA", // the MAC address
       "maxBitrateRX": 100,               // max receive bitrate in Mbit/s
       "maxBitrateTX": 100,               // max transmit bitrate in Mbit/s
@@ -98,7 +98,7 @@ Each node can have several network interfaces. Provide as many details as possib
     // wifi interface wlan0
     {
       "name": "wlan0",
-      "type": "wifi",
+      "physicalType": "wifi",
       "macAddress": "00:11:22:33:44:55",
       "maxBitrateRX": 300,
       "maxBitrateTX": 300,
