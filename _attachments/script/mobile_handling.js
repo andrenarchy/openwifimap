@@ -89,6 +89,26 @@ function getPopupHTML(nodedata) {
     return ich.mappopupmust(nodedata, true);
 }
 
+// obj may be an object or a list
+function scanListsObj(obj) {
+    if (obj instanceof Array) {
+        for (var i=0; i<obj.length; i++) {
+            scan(obj[i]);
+        }
+        return obj.length>0
+    }
+    if (obj instanceof Object) {
+        for (var key in obj) {
+            var val = obj[key];
+            var nonempty = scan(val);
+            if (scanListsObj(val)) {
+                obj[String(key)+"?"] = true;
+            }
+        }
+        return false;
+    }
+}
+
 //////////////////////////////////////////////////////////
 // map page
 var mappagemap = null;
