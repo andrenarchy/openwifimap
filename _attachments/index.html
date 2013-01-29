@@ -91,7 +91,7 @@
                 <div id="avaframe">
                     <img id="avatar" src="images/wifi_icon60.png" />
                 </div>
-                <h2>{{hostname}}</h2>
+                <h2><a href="http://{{_id}}">{{hostname}}</a></h2>
             </div>
             <!--div data-role="collapsible-set"-->
                 <div data-role="collapsible" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-collapsed="false">
@@ -152,17 +152,53 @@
                                 <td>{{macAddress}}</td>
                             </tr>
                             {{/macAddress}}
+                            {{#accessNote}}
+                            <tr>
+                                <td>Access Note</td>
+                                <td>{{accessNote}}</td>
+                            </tr>
+                            {{/accessNote}}
+                            {{#channel}}
+                            <tr>
+                                <td>Wireless Channel</td>
+                                <td>{{channel}}</td>
+                            </tr>
+                            {{/channel}}
+                            {{#ssid}}
+                            <tr>
+                                <td>Wireless SSID</td>
+                                <td>{{ssid}}</td>
+                            </tr>
+                            {{/ssid}}
+                            {{#bssid}}
+                            <tr>
+                                <td>Wireless SSID</td>
+                                <td>{{bssid}}</td>
+                            </tr>
+                            {{/bssid}}
+                            {{#mode}}
+                            <tr>
+                                <td>Wireless Mode</td>
+                                <td>{{mode}}</td>
+                            </tr>
+                            {{/mode}}
+                            {{#txpower}}
+                            <tr>
+                                <td>Wireless TX Power</td>
+                                <td>{{txpower}} dBm</td>
+                            </tr>
+                            {{/txpower}}
                         </table>
                     </div>
                     {{/interfaces}}
                     <table class="fifty">
                         <tr>
                             <td>IPv4 default Gateway</td>
-                            <td>{{ipv4defaultGateway}}</td>
+                            <td>{{ipv4defaultGateway.gateway}} device:{{ipv6defaultGateway.dev}} metric:{{ipv6defaultGateway.metr}}</td>
                         </tr>
                         <tr>
                             <td>IPv6 default Gateway</td>
-                            <td>{{ipv6defaultGateway}}</td>
+                            <td>{{ipv6defaultGateway.gateway}} device:{{ipv6defaultGateway.dev}} metric:{{ipv6defaultGateway.metr}}</td>
                         </tr>
                     </table>
                 </div>
