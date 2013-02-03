@@ -147,7 +147,91 @@ Each node can have several network interfaces. Provide as many details as possib
         "verticalBeamwidth": 17,            // vertical beamwidth of antenna in degrees, range [-90,90],
                                             //   see horizontalBeamwidth
         "polarization": "vertical"          // polarization of antenna
-      }
+      },
+      "wireless": [
+           {
+               "ifname": "wlan0-1",
+               "encryption": {
+                   "enabled": false,
+                   "auth_algs": [
+                   ],
+                   "description": "None",
+                   "wep": false,
+                   "auth_suites": [
+                       "PSK"
+                   ],
+                   "wpa": 0,
+                   "pair_ciphers": [
+                   ],
+                   "group_ciphers": [
+                   ]
+               },
+               "bssid": "82:CA:FF:EE:BA:BE",
+               "probereq": "1",
+               "mode": "Ad-Hoc",
+               "quality": 64,
+               "noise": -95,
+               "ssid": "ch8.freifunk.net",
+               "up": "1",
+               "device": "radio0",
+               "bgscan": "0",
+               "bitrate": 79000,
+               "txpower": 19,
+               "wirelessdevice": {
+                   "type": "mac80211",
+                   "disabled": "0",
+                   "country": "DE",
+                   "txpower": "19",
+                   "ht_capab": [
+                       "SHORT-GI-40",
+                       "DSSS_CCK-40"
+                   ],
+                   "hwmode": "11ng",
+                   "name": "radio0",
+                   "channel": "8",
+                   "macaddr": "d8:5d:XX:XX:19:b2",
+                   "htmode": "HT20"
+               },
+               "channel": 8,
+               "assoclist": [
+                   {
+                       "rx_short_gi": false,
+                       "noise": -95,
+                       "rx_mcs": 0,
+                       "tx_40mhz": false,
+                       "rx_40mhz": false,
+                       "mac": "00:1E:XX:XX:6C:79",
+                       "tx_rate": 54000,
+                       "tx_packets": 265,
+                       "tx_short_gi": false,
+                       "rx_packets": 41061,
+                       "tx_mcs": 0,
+                       "inactive": 70,
+                       "rx_rate": 5500,
+                       "signal": -51
+                   },
+                   {
+                       "rx_short_gi": false,
+                       "noise": -95,
+                       "rx_mcs": 0,
+                       "tx_40mhz": false,
+                       "rx_40mhz": false,
+                       "mac": "54:E6:XX:XX:32:1E",
+                       "tx_rate": 104000,
+                       "tx_packets": 1192505,
+                       "tx_short_gi": false,
+                       "rx_packets": 11742264,
+                       "tx_mcs": 13,
+                       "inactive": 70,
+                       "rx_rate": 5500,
+                       "signal": -41
+                   }
+               ],
+               "quality_max": 70,
+               "network": "wireless0",
+               "signal": -46
+           }
+       ],
     }
   ]
 ```
