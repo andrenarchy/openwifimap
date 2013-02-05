@@ -190,6 +190,41 @@
                             {{/txpower}}
                         </table>
                     </div>
+                   {{#wifi?}}
+                    <div data-role="collapsible" data-theme="c" data-content-theme="c" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                        <h4>Wireless {{name}}</h4>
+                       {{#wifi}}
+                        <table class="fifty">
+                            <tr>
+                                <td>
+				    <tr>
+					<td>{{ifname}} Device</td>
+					<td>{{device}}</td>
+				    </tr>
+                                </td>
+                                <td>
+				    <tr>
+					<td>{{ifname}} SSID</td>
+					<td>{{ssid}}</td>
+				    </tr>
+                                </td>
+                                <td>
+				    <tr>
+					<td>{{ifname}} BSSID</td>
+					<td>{{bssid}}</td>
+				    </tr>
+                                </td>
+                                <td>
+				    <tr>
+					<td>{{ifname}} Signal/Noise/Quality</td>
+					<td>{{signal}}/{{noise}}/{{quality}}</td>
+				    </tr>
+                                </td>
+                            </tr>
+                        </table>
+                       {{/wifi}}
+                    </div>
+                    {{/wifi?}}
                     {{/interfaces}}
                     <table class="fifty">
                         <tr>
