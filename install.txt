@@ -4,15 +4,15 @@ pip install couchapp
 
 emerge -pv couchdb
 cd 
-mkdir -p /usr/local/portage/couch/geocouch
-wget -O /usr/local/portage/couch/geocouch/geocouch-1.2.1.ebuild https://gist.github.com/stargieg/4966467/raw/c3b14d24d964ef343e2a49445bd7cf94870d7288/geocouch-1.2.1.ebuild
+mkdir -p /usr/local/portage/couch/dev-db/geocouch
+wget -O /usr/local/portage/couch/dev-db/geocouch/geocouch-1.2.1.ebuild https://gist.github.com/stargieg/4966467/raw/c3b14d24d964ef343e2a49445bd7cf94870d7288/geocouch-1.2.1.ebuild
 echo 'PORTDIR_OVERLAY="
 /usr/local/portage/couch
 $PORTDIR_OVERLAY
 "' >> /etc/make.conf
 
 ebuild /usr/portage/dev-db/couchdb/couchdb-1.2.1.ebuild  compile
-ebuild /usr/local/portage/couch/geocouch/geocouch-1.2.1.ebuild install --skip-manifest
+ebuild /usr/local/portage/couch/dev-db/geocouch/geocouch-1.2.1.ebuild install --skip-manifest
 
 
 ##############################DEBIAN 6##########################################
