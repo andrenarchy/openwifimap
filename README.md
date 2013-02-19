@@ -272,7 +272,7 @@ Each node can have several network interfaces. Provide as many details as possib
   "created": "2013-01-06T01:33:52Z",    // timestamp of creation in UTC
   "height": 15.5,                       // height in meters above ground level
   "indoor": true,                       // is this node placed indoors?
-  "updateInterval": 600,
+  "updateInterval": 600,                // in seconds
   "ipv4defaultGateway": "104.201.0.33",
   "ipv6defaultGateway": "dead:1337::1",
   "tags": [
