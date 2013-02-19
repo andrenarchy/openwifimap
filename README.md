@@ -18,6 +18,10 @@ To make URLs nicer you can use CouchDB URL rewrites. If your CouchDB is accessed
 openwifimap is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
 # Developers corner
+## Useful links
+* Openwrt Packages: https://github.com/freifunk/packages-pberg/tree/master/utils/luci-app-owm
+* Linux shell script: https://github.com/freifunk/ff-control/blob/master/scripts/dns-bonjour-geo-map.sh
+
 ## Documentation of node documents
 Each node's data **must be updated at least once a day**. If a node is not updated for several days it is considered to be offline and removed from the map. 
 
@@ -32,6 +36,7 @@ We all love documentation by example, so here is one. There are a few required f
   "longitude": 13.40951,                // required: longitude in degrees, range [-90,90], EPSG:3857
   "latitude": 52.520791,                // required: latitude in degrees, range [-180,180], EPSG:3857
   "lastupdate": "2013-01-12T12:30:12Z"  // required: timestamp of last update in UTC
+  "updateInterval": 600,                // required: in seconds
 }
 ```
 
@@ -147,7 +152,91 @@ Each node can have several network interfaces. Provide as many details as possib
         "verticalBeamwidth": 17,            // vertical beamwidth of antenna in degrees, range [-90,90],
                                             //   see horizontalBeamwidth
         "polarization": "vertical"          // polarization of antenna
-      }
+      },
+      "wireless": [
+           {
+               "ifname": "wlan0-1",
+               "encryption": {
+                   "enabled": false,
+                   "auth_algs": [
+                   ],
+                   "description": "None",
+                   "wep": false,
+                   "auth_suites": [
+                       "PSK"
+                   ],
+                   "wpa": 0,
+                   "pair_ciphers": [
+                   ],
+                   "group_ciphers": [
+                   ]
+               },
+               "bssid": "82:CA:FF:EE:BA:BE",
+               "probereq": "1",
+               "mode": "Ad-Hoc",
+               "quality": 64,
+               "noise": -95,
+               "ssid": "ch8.freifunk.net",
+               "up": "1",
+               "device": "radio0",
+               "bgscan": "0",
+               "bitrate": 79000,
+               "txpower": 19,
+               "wirelessdevice": {
+                   "type": "mac80211",
+                   "disabled": "0",
+                   "country": "DE",
+                   "txpower": "19",
+                   "ht_capab": [
+                       "SHORT-GI-40",
+                       "DSSS_CCK-40"
+                   ],
+                   "hwmode": "11ng",
+                   "name": "radio0",
+                   "channel": "8",
+                   "macaddr": "d8:5d:XX:XX:19:b2",
+                   "htmode": "HT20"
+               },
+               "channel": 8,
+               "assoclist": [
+                   {
+                       "rx_short_gi": false,
+                       "noise": -95,
+                       "rx_mcs": 0,
+                       "tx_40mhz": false,
+                       "rx_40mhz": false,
+                       "mac": "00:1E:XX:XX:6C:79",
+                       "tx_rate": 54000,
+                       "tx_packets": 265,
+                       "tx_short_gi": false,
+                       "rx_packets": 41061,
+                       "tx_mcs": 0,
+                       "inactive": 70,
+                       "rx_rate": 5500,
+                       "signal": -51
+                   },
+                   {
+                       "rx_short_gi": false,
+                       "noise": -95,
+                       "rx_mcs": 0,
+                       "tx_40mhz": false,
+                       "rx_40mhz": false,
+                       "mac": "54:E6:XX:XX:32:1E",
+                       "tx_rate": 104000,
+                       "tx_packets": 1192505,
+                       "tx_short_gi": false,
+                       "rx_packets": 11742264,
+                       "tx_mcs": 13,
+                       "inactive": 70,
+                       "rx_rate": 5500,
+                       "signal": -41
+                   }
+               ],
+               "quality_max": 70,
+               "network": "wireless0",
+               "signal": -46
+           }
+       ],
     }
   ]
 ```
@@ -188,7 +277,6 @@ Each node can have several network interfaces. Provide as many details as possib
   "created": "2013-01-06T01:33:52Z",    // timestamp of creation in UTC
   "height": 15.5,                       // height in meters above ground level
   "indoor": true,                       // is this node placed indoors?
-  "updateInterval": 600,
   "ipv4defaultGateway": "104.201.0.33",
   "ipv6defaultGateway": "dead:1337::1",
   "tags": [
