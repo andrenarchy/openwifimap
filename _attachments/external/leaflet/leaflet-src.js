@@ -6630,10 +6630,10 @@ L.control.zoom = function (options) {
 };
 
 L.Control.Attribution = L.Control.extend({
-	options: {
-		position: 'bottomright',
-		prefix: 'Powered by <a href="http://leaflet.cloudmade.com">Leaflet</a>'
-	},
+//	options: {
+//		position: 'bottomright',
+//		prefix: 'Powered by <a href="http://leaflet.cloudmade.com">Leaflet</a>'
+//	},
 
 	initialize: function (options) {
 		L.Util.setOptions(this, options);
