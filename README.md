@@ -18,6 +18,10 @@ To make URLs nicer you can use CouchDB URL rewrites. If your CouchDB is accessed
 openwifimap is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
 # Developers corner
+## Useful links
+* Openwrt Packages: https://github.com/freifunk/packages-pberg/tree/master/utils/luci-app-owm
+* Linux shell script: https://github.com/freifunk/ff-control/blob/master/scripts/dns-bonjour-geo-map.sh
+
 ## Documentation of node documents
 Each node's data **must be updated at least once a day**. If a node is not updated for several days it is considered to be offline and removed from the map. 
 
