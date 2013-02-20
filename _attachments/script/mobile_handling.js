@@ -226,7 +226,10 @@ var datapending = true;
 
 function detailmapResize() {
     var map = $("#detailmap");
-    map.height( map.width()*0.5 );
+    width = ( $(document).width() < 500 ) ? '100%' : '50%';
+    $('#detailmapcontainer').css('width', width);
+    $('#detailaddrcontainer').css('width', width);
+    map.height( map.width()*0.8 );
     if (detailpagemap) {
         detailpagemap.map.invalidateSize();
     }
