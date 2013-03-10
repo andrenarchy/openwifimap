@@ -163,16 +163,14 @@ $('#map').live('pageshow', function() {
     }
 
     if (bbox) {
-        /*
         // nasty hack: shrink the bbox a bit, so we don't zoom out
-        w = bbox.getWidth();
-        h = bbox.getHeight();
-        eps = 0.01;
-        bbox.left += eps*w;
-        bbox.right -= eps*w;
-        bbox.bottom += eps*h;
-        bbox.top -= eps*h;
-        */
+        w = bbox[1][1] - bbox[0][1];
+        h = bbox[1][0] - bbox[0][0];
+        eps = 0.1;
+        bbox[0][1] += eps*w;
+        bbox[1][1] -= eps*w;
+        bbox[0][0] += eps*h;
+        bbox[1][0] -= eps*h;
 
         // might zoom out a bit without nasty hack ;)
         mappagemapResize();
