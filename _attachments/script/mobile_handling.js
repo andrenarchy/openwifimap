@@ -163,6 +163,7 @@ $('#map').live('pageshow', function() {
     }
 
     if (bbox) {
+        /*
         // nasty hack: shrink the bbox a bit, so we don't zoom out
         w = bbox[1][1] - bbox[0][1];
         h = bbox[1][0] - bbox[0][0];
@@ -171,11 +172,12 @@ $('#map').live('pageshow', function() {
         bbox[1][1] -= eps*w;
         bbox[0][0] += eps*h;
         bbox[1][0] -= eps*h;
-
+        */
         // might zoom out a bit without nasty hack ;)
         mappagemapResize();
         ignoreNextHashChange = true;
-        mappagemap.map.fitBounds(bbox);
+        var zoom = mappagemap.map.getBoundsZoom(bbox, true);
+        mappagemap.map.setView(L.latLngBounds(bbox).getCenter(), zoom);
     }
 });
 
