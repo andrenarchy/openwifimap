@@ -16,10 +16,9 @@
         <link rel="stylesheet" href="http://danzel.github.com/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
         <!--[if lte IE 8]><link rel="stylesheet" href="http://danzel.github.com/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css" /><![endif]-->
 
+        <script src="https://raw.github.com/andrenarchy/jquery-mobile-params/master/jquery-mobile-params.js"></script>
         <script>
-            $(document).bind("mobileinit", function(){
-                $.mobile.hashListeningEnabled = false;
-                $.mobile.pushStateEnabled = false;
+            $(document).on("mobileinit", function(){
                 $.mobile.defaultHomeScroll = 0;
             });
         </script>
@@ -288,7 +287,7 @@
                 <div data-role="footer">
                     <div class="ui-grid-b">
                         <div class="ui-block-a">
-                            <a href="#about" data-role="button" data-rel="popup" data-position-to="window" data-transition="fade" data-mini="false">About</a>
+                            <a data-role="button" data-rel="popup" data-position-to="window" data-transition="fade" data-mini="false" onclick="$('#about').popup( 'open' )">About</a>
                             <div data-role="popup" id="about" data-theme="b" data-overlay-theme="a">
                                 <div data-role="header">
                                     <h1>About</h1>

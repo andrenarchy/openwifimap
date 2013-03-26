@@ -29,60 +29,6 @@ function queryStringToObject( qstr )
     return result;
 }
 
-function parseHashSearchUrl(url) {
-    var loc = $.mobile.path.parseUrl( url );
-    var ret = {
-        hrefnosearch: loc.hrefNoSearch,
-        hash: loc.hash.replace( /^#/, ""),
-        search: loc.search
-    };
-    if (ret.hash) {
-        loc = $.mobile.path.parseUrl( ret.hash );
-        ret.hash = loc.pathname;
-        ret.search = loc.search;
-    }
-    return ret;
-}
-
-var firstPage = true;
-var ignoreNextHashChange = false;
-var defaultPage = "map";
-$( document ).bind( "pagebeforechange", function( e, data ) {
-    var hs;
-    if (firstPage) {
-        hs = parseHashSearchUrl(window.location.href);
-    } else if (typeof data.toPage === "string") {
-        hs = parseHashSearchUrl( data.toPage );
-    } else {
-        return;
-    }
-
-    firstPage=false;
-    if (!data.options.dataUrl) {
-        data.options.dataUrl = data.toPage;
-    }
-
-    data.toPage = hs.hrefnosearch + "#" + hs.hash;
-    if (hs.search) {
-        data.options.pageData = queryStringToObject( hs.search );
-    }
-
-    $.mobile.activePageData = (data && data.options && data.options.pageData)
-        ? data.options.pageData
-        : null;
-    ignoreNextHashChange = true;
-});
-
-$( window ).bind( "hashchange", function( e ) {
-    if (!ignoreNextHashChange) {
-        $.mobile.changePage( $.mobile.path.parseLocation().hash , {
-            allowSamePageTransition: true,
-            transition: "none"
-        });
-    }
-    ignoreNextHashChange = false;
-});
-
 //////////////////////////////////////////////////////////
 // general functions
 function getPopupHTML(nodedata) {
@@ -127,11 +73,10 @@ function getBBOXfromString(str) {
 }
 
 function mappageOnBboxChange(bboxstr) {
-    var currentPageID = $.mobile.activePage == null ? defaultPage : $.mobile.activePage.attr('id');
-    if (currentPageID=="map") {
-        ignoreNextHashChange = true;
-        window.location.hash = "#map?bbox=" + bboxstr;
-        $("a#listlink").attr("href", "#list?bbox=" + bboxstr);
+    var currentPageID = $.mobile.activePage == null ? 'map' : $.mobile.activePage.attr('id');
+    if (currentPageID=='map') {
+        params.sethash( '#map?bbox=' + bboxstr );
+        $("a#listlink").attr('href', '#list?bbox=' + bboxstr);
     }
 }
 
@@ -144,15 +89,15 @@ function mappageOnNodeUpdate(bboxstr, nodes) {
 
 function mappagemapResize() {
     if (mappagemap) {
-        ignoreNextHashChange = true;
+        //params.ignoreNextHashChange = true;
         mappagemap.map.invalidateSize();
     }
 }
 
-$('#map').live('pageshow', function() {
+$(document).on('pageshow', '#map', function() {
     var bbox = null;
-    if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
-        bbox = getBBOXfromString($.mobile.activePageData.bbox);
+    if ($.mobile.pageData && $.mobile.pageData.bbox && typeof $.mobile.pageData.bbox == "string") {
+        bbox = getBBOXfromString($.mobile.pageData.bbox);
     }
 
     if (!mappagemap) {
@@ -175,13 +120,13 @@ $('#map').live('pageshow', function() {
         */
         // might zoom out a bit without nasty hack ;)
         mappagemapResize();
-        ignoreNextHashChange = true;
+        //params.ignoreNextHashChange = true;
         var zoom = mappagemap.map.getBoundsZoom(bbox, true);
         mappagemap.map.setView(L.latLngBounds(bbox).getCenter(), zoom);
     }
-});
+})
 
-$(window).bind("pageshow resize", mappagemapResize);
+$(window).on("pageshow resize", mappagemapResize);
 
 
 //////////////////////////////////////////////////////////
@@ -196,10 +141,10 @@ function listUpdate(data) {
     }
 }
 
-$('#list').live('pagebeforeshow', function (){
+$(document).on('pagebeforeshow', '#list', function (){
     bboxstr = null;
-    if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
-        bboxstr = $.mobile.activePageData.bbox;
+    if ($.mobile.pageData && $.mobile.pageData.bbox && typeof $.mobile.pageData.bbox == "string") {
+        bboxstr = $.mobile.pageData.bbox;
     }
     if (bboxstr) {
         $("a#maplink").attr("href", "#map?bbox=" + bboxstr);
@@ -235,12 +180,12 @@ function detailmapResize() {
     }
 }
 
-$(window).bind("pageshow resize", detailmapResize);
+$(window).on("pageshow resize", detailmapResize);
 
-$('#detail').live('pagebeforeshow', function (){
+$(document).on('pagebeforeshow', '#detail', function () {
     var bboxstr = null;
-    if ($.mobile.activePageData && $.mobile.activePageData.bbox && typeof $.mobile.activePageData.bbox == "string") {
-        bboxstr = $.mobile.activePageData.bbox;
+    if ($.mobile.pageData && $.mobile.pageData.bbox && typeof $.mobile.pageData.bbox == "string") {
+        bboxstr = $.mobile.pageData.bbox;
     }
     if (bboxstr) {
         $("a#detailback").attr("href", "#list?bbox=" + bboxstr );
@@ -251,8 +196,8 @@ $('#detail').live('pagebeforeshow', function (){
     }
 
     node = null;
-    if ($.mobile.activePageData && $.mobile.activePageData.node && (typeof $.mobile.activePageData.node == "string")) {
-        node = $.mobile.activePageData.node;
+    if ($.mobile.pageData && $.mobile.pageData.node && (typeof $.mobile.pageData.node == "string")) {
+        node = $.mobile.pageData.node;
     }
     if (node) {
         $.getJSON('/openwifimap/' + node, {}, function(data) {
