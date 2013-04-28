@@ -208,7 +208,14 @@ L.CouchMap = function (options) {
             a = tile2LatLng(x, y, zoom),
             b = tile2LatLng(x+1, y+1, zoom);
         // place marker in the middle of the tile
-        var icon = new L.DivIcon({ html: '<div><span>' + item.value + '</span></div>', className: 'marker-cluster marker-cluster-large', iconSize: new L.Point(40, 40) });
+        var size = 'large';
+        if (item.value < 10) {
+          size = 'small';
+        } else if (item.value < 100) {
+          size = 'medium';
+        }
+
+        var icon = new L.DivIcon({ html: '<div><span>' + item.value + '</span></div>', className: 'marker-cluster marker-cluster-'+size, iconSize: new L.Point(40, 40) });
         count += item.value;
 
         L.marker( [ (a.lat+b.lat)/2, (a.lng+b.lng)/2], {icon: icon}).addTo(layer_nodes_coarse).on('click', function(e) {
