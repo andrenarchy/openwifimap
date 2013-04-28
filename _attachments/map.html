@@ -40,7 +40,11 @@
       }
 
       $(document).ready(function() {
-        var mapwidget = new MapWidget();
+        var mapwidget = new MapWidget({
+          couchmapoptions: {
+              coarseThreshold: 100
+            }
+          });
         
         function onResize() {
           $("#map").height( $(window).height() );
