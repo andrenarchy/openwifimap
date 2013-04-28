@@ -39,24 +39,17 @@
         return ich.mappopupmust(nodedata, true);
       }
 
-      function resizeMap() {
-        $("#map").height( $(window).height() );
-        if (map) {
-          //map.invalidateSize();
-        }
-      }
       $(document).ready(function() {
         var mapwidget = new MapWidget();
-        //resizeMap();
-        mapwidget.map.locate({setView: true, maxZoom: 15});
         
         function onResize() {
           $("#map").height( $(window).height() );
           mapwidget.map.invalidateSize();
         }
-        
+
         $(window).resize( onResize );
         onResize();
+        mapwidget.map.locate({setView: true, maxZoom: 15});
       });
     </script>
   </body>
