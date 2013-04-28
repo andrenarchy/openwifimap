@@ -32,7 +32,7 @@ var MapWidget = function (options) {
     ).addTo(widget.map);
 
   widget.control_scale = L.control.scale({imperial: false, maxWidth: 150}).addTo(widget.map);
-  widget.map.attributionControl.addAttribution('blaaaaa 2013');
+  widget.map.attributionControl.addAttribution('Nodes+Links &copy; <a href="http://openwifimap.net">OpenWiFiMap</a> contributors under <a href="http://opendatacommons.org/licenses/odbl/summary/">ODbL</a>');
 
   return widget;
 }
