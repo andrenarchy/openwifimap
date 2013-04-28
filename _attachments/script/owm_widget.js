@@ -17,7 +17,7 @@ var MapWidget = function (options) {
   // https://raw.github.com/shramov/leaflet-plugins/master/layer/tile/Bing.js
   var tile_bing = new L.BingLayer("ArewtcSllazYp52r7tojb64N94l-OrYWuS1GjUGeTavPmJP_jde3PIdpuYm24VpR");
   
-  var couchmap = new L.CouchMap();
+  var couchmap = new L.CouchMap(options.couchmapoptions);
   var couchlayers = couchmap.getLayers();
   
   widget.control_layers = L.control.layers(
